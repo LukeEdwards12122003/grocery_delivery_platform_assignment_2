@@ -9,14 +9,18 @@ const Navbar = () => {
     logout();
     navigate('/login');
   };
-
   return (
     <nav className="bg-blue-600 text-white p-4 flex justify-between items-center">
-      <Link to="/" className="text-2xl font-bold">Task Manager</Link>
+      <Link to={user?.role === 'staff' ? '/staff' : '/customer'} className="text-2xl font-bold">Grocery Delivery Platform</Link>
       <div>
         {user ? (
           <>
-            <Link to="/tasks" className="mr-4">Tasks</Link>
+            {user.role === 'customer' && (
+              <Link to="/customer" className="mr-4">Customer Home</Link>
+            )}
+            {user.role === 'staff' && (
+              <Link to="/staff" className="mr-4">Staff Home</Link>
+            )}
             <Link to="/profile" className="mr-4">Profile</Link>
             <button
               onClick={handleLogout}
@@ -40,5 +44,4 @@ const Navbar = () => {
     </nav>
   );
 };
-
 export default Navbar;
