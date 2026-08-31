@@ -1,5 +1,18 @@
 const Order = require('../models/Orders');
 
+const getOrders = async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({ message: 'Only customers can view their orders' });
+        }
+
+        const orders = await Order.find({ customerId: req.user.id });
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const addOrder = async (req, res) => {
     const { item, quantity, deliveryAddress } = req.body;
     try {
@@ -10,7 +23,6 @@ const addOrder = async (req, res) => {
         if (!item || !quantity || !deliveryAddress || Number(quantity) <= 0) {
             return res.status(400).json({ message: 'Please provide valid order details' });
         }
-
         const order = await Order.create({
             customerId: req.user.id,
             item,
@@ -24,4 +36,4 @@ const addOrder = async (req, res) => {
     }
 };
 
-module.exports = { addOrder };
+module.exports = { getOrders, addOrder };
