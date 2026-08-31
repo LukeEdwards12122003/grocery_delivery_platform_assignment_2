@@ -2,24 +2,27 @@ const Order = require('../models/Orders');
 
 const getOrders = async (req, res) => {
     try {
-        if (req.user.role !== 'customer') {
-            return res.status(403).json({ message: 'Only customers can view their orders' });
+        let orders;
+
+        if (req.user.role === 'staff') {
+            orders = await Order.find().populate('customerId', 'name email');
+        } else if (req.user.role === 'customer') {
+            orders = await Order.find({ customerId: req.user.id });
+        } else {
+            return res.status(403).json({ message: 'Access denied' });
         }
 
-        const orders = await Order.find({ customerId: req.user.id });
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-
 const addOrder = async (req, res) => {
     const { item, quantity, deliveryAddress } = req.body;
     try {
         if (req.user.role !== 'customer') {
             return res.status(403).json({ message: 'Only customers can place orders' });
         }
-
         if (!item || !quantity || !deliveryAddress || Number(quantity) <= 0) {
             return res.status(400).json({ message: 'Please provide valid order details' });
         }
