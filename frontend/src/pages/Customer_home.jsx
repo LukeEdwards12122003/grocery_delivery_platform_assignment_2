@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 
@@ -11,6 +11,24 @@ const CustomerHome = () => {
     deliveryAddress: '',
   });
 
+  const [orders, setOrders] = useState([]);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await axiosInstance.get('/api/orders', {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+
+      setOrders(response.data);
+    } catch (error) {
+      alert('Failed to load orders. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -18,7 +36,6 @@ const CustomerHome = () => {
       await axiosInstance.post('/api/orders', formData, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-
       alert('Order placed successfully.');
 
       setFormData({
@@ -26,6 +43,8 @@ const CustomerHome = () => {
         quantity: 1,
         deliveryAddress: '',
       });
+
+      fetchOrders();
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to place order. Please try again.');
     }
@@ -80,6 +99,26 @@ const CustomerHome = () => {
             Place Order
           </button>
         </form>
+
+        <div className="mt-8">
+          <h2 className="text-xl font-bold mb-4">My Orders</h2>
+
+          {orders.length === 0 ? (
+            <p>You have no orders.</p>
+          ) : (
+            orders.map((order) => (
+              <div
+                key={order._id}
+                className="border p-4 mb-4 rounded"
+              >
+                <p><strong>Item:</strong> {order.item}</p>
+                <p><strong>Quantity:</strong> {order.quantity}</p>
+                <p><strong>Delivery Address:</strong> {order.deliveryAddress}</p>
+                <p><strong>Status:</strong> {order.status}</p>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
