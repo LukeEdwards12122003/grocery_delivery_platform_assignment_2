@@ -1,28 +1,86 @@
-**Task Manager Application Overview:The task manager application is designed to help users efficiently manage their tasks and responsibilities by providing a user-friendly interface for creating, viewing, updating, and deleting tasks. It includes essential features such as secure user authentication, allowing individuals to sign up and log in to their accounts, as well as profile management to update personal information. With built-in validation such as input field validation and email validation, the application ensures a seamless user experience while enhancing productivity and organization in both personal and professional settings. **
+# Grocery Delivery Platform
 
-**This apps **contain** the following features:**
+## Overview
 
-* Signup
-* Login
-* Logout
-* Update profile
-* Add tasks
-* View tasks
-* Update tasks
-* Delete tasks
+The Grocery Delivery Platform is a small MERN web application developed for IFN636 Assessment 1. The application demonstrates two user roles and two connected end-to-end workflows.
 
-**This **app**lication** is**almost **a** precompiled** app**. However, students will develop some features,**such as adding tasks, viewing tasks, updating tasks, and **deleting** tasks**. **Students** will interact with GitHub when they develop the features.**
+Customers can register, log in, place grocery delivery orders, and view their submitted orders and current status. Store Staff can log in, view incoming customer orders, and update each order's status.
 
----
+## User Roles
 
-**Prerequisite:** Please install the following software and create account in following web tools** **
+### Customer
 
-* **Nodejs [**[https://nodejs.org/en](https://nodejs.org/en)]** **
-* **Git [**[https://git-scm.com/](https://git-scm.com/)]** **
-* **VS code editor** [[https://code.visualstudio.com/](https://code.visualstudio.com/)]** **
-* **MongoDB Account** [[https://account.mongodb.com/account/login](https://account.mongodb.com/account/login)]** - In tutorial, we have also showed how can you create account and database: follow step number 2.**
-* **GitHub Account** [[https://github.com/signup?source=login](https://github.com/signup?source=login)]** **
+- Register and log in
+- Access the Customer Dashboard
+- Place grocery orders
+- Enter a quantity and delivery address
+- View submitted orders
+- View current order status
 
----
+### Store Staff
 
-[![Backend CI](https://github.com/rajuiit/taskmanager_aws_setup/actions/workflows/ci.yml/badge.svg)](https://github.com/rajuiit/taskmanager_aws_setup/actions/workflows/ci.yml)
+- Register and log in
+- Access the Store Staff Dashboard
+- View incoming customer orders
+- View customer details and delivery information
+- Update order status
+
+## Order Status
+
+Orders can have one of the following statuses:
+
+- Pending
+- Preparing
+- Completed
+
+New orders are automatically created with a Pending status.
+
+## Application Architecture
+
+The application uses the MERN stack:
+
+- MongoDB for persistent user and order data
+- Express.js for backend API routes
+- React for the frontend interface
+- Node.js for the backend application
+
+Authentication uses JSON Web Tokens (JWT). Protected backend routes use authentication middleware to identify the logged-in user and control access based on the user's role.
+
+1. Clone the Repository
+git clone https://github.com/LukeEdwards12122003/grocery_delivery_platforms.git
+
+Move into the project folder:
+
+cd grocery_delivery_platforms
+2. Install Dependencies
+
+Install the backend and frontend dependencies from the project root:
+
+npm run install-all
+3. Configure Environment Variables
+
+Create a .env file inside the backend directory.
+
+Use the following structure:
+
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+PORT=5001
+
+Do not commit the .env file or real credentials to GitHub.
+
+The included .env.example file can be used as a reference.
+
+4. Start the Application
+
+From the project root, run:
+
+npm run dev
+
+The frontend runs on:
+
+http://localhost:3000
+
+The backend runs on from mongo db
+
+    
