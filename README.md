@@ -52,35 +52,24 @@ git clone https://github.com/LukeEdwards12122003/grocery_delivery_platforms.git
 Move into the project folder:
 
 cd grocery_delivery_platforms
+
 2. Install Dependencies
-
 Install the backend and frontend dependencies from the project root:
-
 npm run install-all
+
 3. Configure Environment Variables
-
 Create a .env file inside the backend directory.
-
 Use the following structure:
-
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 PORT=5001
 
-Do not commit the .env file or real credentials to GitHub.
-
-The included .env.example file can be used as a reference.
 
 4. Start the Application
-
 From the project root, run:
-
 npm run dev
-
 The frontend runs on:
-
 http://localhost:3000
-
 The backend runs on from mongo db
 
     
