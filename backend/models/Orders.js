@@ -5,7 +5,7 @@ const orderSchema = new mongoose.Schema({
     item: { type: String, required: true },
     quantity: { type: Number, required: true },
     deliveryAddress: { type: String, required: true },
-    status: { type: String, default: 'Pending' },
+    status: { type: String, enum: ['Pending', 'Preparing', 'Completed'], default: 'Pending' },
 });
 
 module.exports = mongoose.model('Order', orderSchema);
