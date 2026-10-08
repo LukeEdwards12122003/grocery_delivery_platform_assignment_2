@@ -1,0 +1,30 @@
+$kind: http-request
+name: Customer Cannot Update Order Status
+url: "{{base_url}}/api/orders/6ac721da9dd0940b04a85607/status"
+method: PUT
+headers:
+  Authorization: Bearer {{customer_token}}
+body:
+  type: json
+  content: |-
+    {
+      "status": "Preparing"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Customer cannot update order status", function () {
+          pm.response.to.have.status(403);
+      });
+
+      pm.test("Correct access error is returned", function () {
+          pm.expect(pm.response.json().message)
+              .to.equal("Only store staff can update order status");
+      });
+    language: text/javascript
+order: 4038053381841351

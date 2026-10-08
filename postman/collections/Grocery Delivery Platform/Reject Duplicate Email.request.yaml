@@ -1,0 +1,26 @@
+$kind: http-request
+name: Reject Duplicate Email
+url: "{{base_url}}/api/auth/register"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "name": "Test Customer",
+      "email": "customer.test@example.com",
+      "password": "TestPassword123!",
+      "role": "customer"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Duplicate email is rejected", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Correct error message is returned", function () {
+          pm.expect(pm.response.json().message)
+              .to.equal("User already exists");
+      });
+    language: text/javascript
+order: 1791434666767

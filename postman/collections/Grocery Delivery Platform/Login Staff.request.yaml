@@ -1,0 +1,34 @@
+$kind: http-request
+name: Login Staff
+url: "{{base_url}}/api/auth/login"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "email": "staff.test@example.com",
+      "password": "TestStaffPassword123!"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Staff login succeeds", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Staff token is returned", function () {
+          const response = pm.response.json();
+
+          pm.expect(response.token).to.be.a("string").and.not.empty;
+          pm.expect(response.role).to.equal("staff");
+      });
+
+      if (pm.response.code === 200) {
+          const response = pm.response.json();
+
+          if (response.token) {
+              pm.collectionVariables.set("staff_token", response.token);
+          }
+      }
+    language: text/javascript
+order: 4367331006902549

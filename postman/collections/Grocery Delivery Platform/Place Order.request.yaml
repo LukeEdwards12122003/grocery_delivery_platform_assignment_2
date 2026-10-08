@@ -1,0 +1,33 @@
+$kind: http-request
+name: Place Order
+url: "{{base_url}}/api/orders"
+method: POST
+headers:
+  Authorization: Bearer {{customer_token}}
+body:
+  type: json
+  content: |-
+    {
+      "item": "Milk",
+      "quantity": 2,
+      "deliveryAddress": "123 Test Street"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Order is created", function () {
+          pm.response.to.have.status(201);
+      });
+
+      pm.test("Created order has the correct details", function () {
+          const order = pm.response.json();
+
+          pm.expect(order.item).to.equal("Milk");
+          pm.expect(order.quantity).to.equal(2);
+          pm.expect(order.status).to.equal("Pending");
+          pm.expect(order._id).to.be.a("string").and.not.empty;
+      });
+    language: text/javascript
+order: 3718403904014162

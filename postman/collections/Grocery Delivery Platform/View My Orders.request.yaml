@@ -1,0 +1,20 @@
+$kind: http-request
+name: View My Orders
+url: "{{base_url}}/api/orders"
+method: GET
+headers:
+  Authorization: Bearer {{customer_token}}
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Orders request succeeds", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is a list of orders", function () {
+          pm.expect(pm.response.json()).to.be.an("array");
+      });
+    language: text/javascript
+order: 3934720038704322

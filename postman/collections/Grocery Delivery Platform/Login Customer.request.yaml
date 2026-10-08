@@ -1,0 +1,39 @@
+$kind: http-request
+name: Login Customer
+url: "{{base_url}}/api/auth/login"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "email": "customer.test@example.com",
+      "password": "TestPassword123!"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Login succeeds", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Customer token is returned", function () {
+          const response = pm.response.json();
+
+          pm.expect(response.token).to.be.a("string").and.not.empty;
+          pm.expect(response.role).to.equal("customer");
+      });
+
+      if (pm.response.code === 200) {
+          const response = pm.response.json();
+
+          if (response.token) {
+              pm.collectionVariables.set("customer_token", response.token);
+          }
+      }
+    language: text/javascript
+order: 2775760078709964
