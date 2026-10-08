@@ -2,7 +2,7 @@ name: Local
 values:
   - key: base_url
     value: ''
-  - key: 'customer_token '
+  - key: customer_token
     value: ''
   - key: staff_token
     value: ''
