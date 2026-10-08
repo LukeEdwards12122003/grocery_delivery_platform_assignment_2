@@ -1,0 +1,27 @@
+$kind: http-request
+name: Reject Invalid Order Status
+url: "{{base_url}}/api/orders/6ac729d99dd0940b04a85628/status"
+method: PUT
+headers:
+  Authorization: Bearer {{staff_token}}
+body:
+  type: json
+  content: |-
+    {
+      "status": "InvalidStatus"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Invalid status is rejected", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Correct error message is returned", function () {
+          pm.expect(pm.response.json().message)
+              .to.equal("Invalid order status");
+      });
+    language: text/javascript
+order: 4475201384068136

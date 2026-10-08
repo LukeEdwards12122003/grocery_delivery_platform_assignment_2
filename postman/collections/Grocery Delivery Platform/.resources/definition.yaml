@@ -1,0 +1,12 @@
+$kind: collection
+name: Grocery Delivery Platform
+variables:
+  - key: base_url
+    value: ""
+    disabled: false
+  - key: customer_token
+    secret: true
+    disabled: false
+  - key: staff_token
+    secret: true
+    disabled: false

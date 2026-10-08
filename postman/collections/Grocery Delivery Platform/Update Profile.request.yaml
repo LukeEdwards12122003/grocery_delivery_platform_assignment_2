@@ -1,0 +1,30 @@
+$kind: http-request
+name: Update Profile
+url: "{{base_url}}/api/auth/profile"
+method: PUT
+headers:
+  Authorization: Bearer {{customer_token}}
+body:
+  type: json
+  content: |-
+    {
+      "name": "Test Customer Updated",
+      "address": "123 Test Street"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Profile update succeeds", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Updated details are returned", function () {
+          const profile = pm.response.json();
+
+          pm.expect(profile.name).to.equal("Test Customer Updated");
+          pm.expect(profile.address).to.equal("123 Test Street");
+      });
+    language: text/javascript
+order: 3549196346351555

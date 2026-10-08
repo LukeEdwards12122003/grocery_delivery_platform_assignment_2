@@ -1,0 +1,23 @@
+$kind: http-request
+name: View Profile
+url: "{{base_url}}/api/auth/profile"
+method: GET
+headers:
+  Authorization: Bearer {{customer_token}}
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Profile request succeeds", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Correct customer profile is returned", function () {
+          const profile = pm.response.json();
+
+          pm.expect(profile.email).to.equal("customer.test@example.com");
+          pm.expect(profile.role).to.equal("customer");
+      });
+    language: text/javascript
+order: 3287112833281291

@@ -1,0 +1,14 @@
+$kind: http-request
+name: Profile Without Token
+url: "{{base_url}}/api/auth/profile"
+method: GET
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Request without a token is rejected", function () {
+          pm.response.to.have.status(401);
+      });
+    language: text/javascript
+order: 3462430251083141

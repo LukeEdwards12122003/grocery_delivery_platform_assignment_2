@@ -1,0 +1,29 @@
+$kind: http-request
+name: Reject Zero Quantity
+url: "{{base_url}}/api/orders"
+method: POST
+headers:
+  Authorization: Bearer {{customer_token}}
+body:
+  type: json
+  content: |-
+    {
+      "item": "Milk",
+      "quantity": 0,
+      "deliveryAddress": "123 Test Street"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Zero quantity is rejected", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Correct validation message is returned", function () {
+          pm.expect(pm.response.json().message)
+              .to.equal("Please provide valid order details");
+      });
+    language: text/javascript
+order: 3812595827574566
