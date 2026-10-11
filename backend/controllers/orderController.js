@@ -1,4 +1,5 @@
-const Order = require('../models/Orders');
+const Order = require('../models/Orders')
+const QuantityValidationHandler = require('../validation/QuantityValidationHandler')
 
 const getOrders = async (req, res) => {
     try {
@@ -20,10 +21,23 @@ const addOrder = async (req, res) => {
     const { item, quantity, deliveryAddress } = req.body;
     try {
         if (req.user.role !== 'customer') {
-            return res.status(403).json({ message: 'Only customers can place orders' });
-        }
-        if (!item || !quantity || !deliveryAddress || Number(quantity) <= 0) {
-            return res.status(400).json({ message: 'Please provide valid order details' });
+      return res
+        .status(403)
+        .json({ message: 'Only customers can place orders' })
+    }
+
+    const quantityHandler = new QuantityValidationHandler()
+    const quantityResult = quantityHandler.handle({
+      quantity,
+    })
+    if (!quantityResult.valid) {
+      return res.status(400).json({ message: quantityResult.message })
+    }
+
+    if (!item || !deliveryAddress) {
+      return res
+        .status(400)
+        .json({ message: 'Please provide valid order details' })
         }
         const order = await Order.create({
             customerId: req.user.id,
