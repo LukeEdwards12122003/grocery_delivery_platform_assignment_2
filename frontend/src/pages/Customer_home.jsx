@@ -40,9 +40,6 @@ const CustomerHome = () => {
       streetAddress: formData.streetAddress,
       suburb: formData.suburb,
       postcode: formData.postcode,
-
-      // Keeps compatibility with the current backend
-      deliveryAddress: `${formData.streetAddress}, ${formData.suburb}, ${formData.postcode}`,
     }
 
     try {
@@ -161,11 +158,9 @@ const CustomerHome = () => {
                 </p>
                 <p>
                   <strong>Delivery Address:</strong>{' '}
-                  {order.streetAddress
-                    ? `${order.streetAddress}, 
-                    ${order.suburb}, 
-                    ${order.postcode}`
-                    : order.deliveryAddress}
+                  {order.streetAddress && order.suburb && order.postcode
+                    ? `${order.streetAddress}, ${order.suburb}, ${order.postcode}`
+                    : order.deliveryAddress || 'Address unavailable'}
                 </p>
                 <p>
                   <strong>Status:</strong> {order.status}
