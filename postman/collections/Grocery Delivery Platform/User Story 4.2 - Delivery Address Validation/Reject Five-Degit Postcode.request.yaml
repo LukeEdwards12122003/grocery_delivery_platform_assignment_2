@@ -1,5 +1,4 @@
 $kind: http-request
-name: Reject Invalid Postcode
 url: "{{base_url}}/api/orders"
 method: POST
 body:
@@ -31,4 +30,4 @@ scripts:
           .to.equal("Postcode must contain exactly four digits");
       });
     language: text/javascript
-order: 4178277897281111
+order: 4178804651516971
