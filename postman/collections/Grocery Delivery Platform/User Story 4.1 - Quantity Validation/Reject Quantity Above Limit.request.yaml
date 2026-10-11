@@ -1,0 +1,32 @@
+$kind: http-request
+name: Reject Quantity Above Limit
+description: ""
+url: "{{base_url}}/api/orders"
+method: POST
+headers:
+  Authorization: Bearer {{customer_token}}
+body:
+  type: json
+  content: |+
+    {
+        "item": "Milk",
+        "quantity": 11,
+        "deliveryAddress": "123 Test Street"
+    }
+
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Quantity above 10 is rejected", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Correct quantity error is returned", function () {
+          pm.expect(pm.response.json().message)
+              .to.equal("The maximum quantity is 10");
+      });
+    language: text/javascript
+order: 4224250288998802
