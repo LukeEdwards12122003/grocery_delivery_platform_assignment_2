@@ -9,7 +9,7 @@ body:
   type: json
   content: |+
     {
-        "item": "Milk",
+        "item": "InvalidQuantityTestItem",
         "quantity": 11,
         "deliveryAddress": "123 Test Street"
     }
