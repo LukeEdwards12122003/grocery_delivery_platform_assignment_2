@@ -8,8 +8,10 @@ const CustomerHome = () => {
   const [formData, setFormData] = useState({
     item: '',
     quantity: 1,
-    deliveryAddress: '',
-  });
+    streetAddress: '',
+    suburb: '',
+    postcode: '',
+  })
 
   const [orders, setOrders] = useState([]);
 
@@ -30,10 +32,21 @@ const CustomerHome = () => {
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
+
+    const orderData = {
+      item: formData.item,
+      quantity: Number(formData.quantity),
+      streetAddress: formData.streetAddress,
+      suburb: formData.suburb,
+      postcode: formData.postcode,
+
+      // Keeps compatibility with the current backend
+      deliveryAddress: `${formData.streetAddress}, ${formData.suburb}, ${formData.postcode}`,
+    }
 
     try {
-      await axiosInstance.post('/api/orders', formData, {
+      await axiosInstance.post('/api/orders', orderData, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       alert('Order placed successfully.');
@@ -41,8 +54,10 @@ const CustomerHome = () => {
       setFormData({
         item: '',
         quantity: 1,
-        deliveryAddress: '',
-      });
+        streetAddress: '',
+        suburb: '',
+        postcode: '',
+      })
 
       fetchOrders();
     } catch (error) {
@@ -78,17 +93,47 @@ const CustomerHome = () => {
             placeholder="Quantity"
             min="1"
             value={formData.quantity}
-            onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, quantity: e.target.value })
+            }
             className="w-full mb-4 p-2 border rounded"
             required
           />
 
           <input
             type="text"
-            placeholder="Delivery Address"
-            value={formData.deliveryAddress}
-            onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })}
+            placeholder="Street Address"
+            value={formData.streetAddress}
+            onChange={(e) =>
+              setFormData({ ...formData, streetAddress: e.target.value })
+            }
             className="w-full mb-4 p-2 border rounded"
+            required
+          />
+
+          <input
+            type="text"
+            placeholder="Suburb"
+            value={formData.suburb}
+            onChange={(e) =>
+              setFormData({ ...formData, suburb: e.target.value })
+            }
+            className="w-full mb-4 p-2 border rounded"
+            required
+          />
+
+          <input
+            type="text"
+            placeholder="Postcode"
+            value={formData.postcode}
+            onChange={(e) =>
+              setFormData({ ...formData, postcode: e.target.value })
+            }
+            className="w-full mb-4 p-2 border rounded"
+            inputMode="numeric"
+            maxLength="4"
+            pattern="[0-9]{4}"
+            title="Postcode must contain exactly four digits"
             required
           />
 
@@ -107,14 +152,24 @@ const CustomerHome = () => {
             <p>You have no orders.</p>
           ) : (
             orders.map((order) => (
-              <div
-                key={order._id}
-                className="border p-4 mb-4 rounded"
-              >
-                <p><strong>Item:</strong> {order.item}</p>
-                <p><strong>Quantity:</strong> {order.quantity}</p>
-                <p><strong>Delivery Address:</strong> {order.deliveryAddress}</p>
-                <p><strong>Status:</strong> {order.status}</p>
+              <div key={order._id} className="border p-4 mb-4 rounded">
+                <p>
+                  <strong>Item:</strong> {order.item}
+                </p>
+                <p>
+                  <strong>Quantity:</strong> {order.quantity}
+                </p>
+                <p>
+                  <strong>Delivery Address:</strong>{' '}
+                  {order.streetAddress
+                    ? `${order.streetAddress}, 
+                    ${order.suburb}, 
+                    ${order.postcode}`
+                    : order.deliveryAddress}
+                </p>
+                <p>
+                  <strong>Status:</strong> {order.status}
+                </p>
               </div>
             ))
           )}
