@@ -1,0 +1,33 @@
+$kind: http-request
+name: Reject Missing Suburb
+url: "{{base_url}}/api/orders"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "item": "Milk",
+      "quantity": 2,
+      "streetAddress": "123 Test Street",
+      "postcode": "4000"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Missing suburb is rejected", function () {
+        pm.response.to.have.status(400);
+      });
+
+      pm.test("Correct error message is returned", function () {
+        pm.expect(pm.response.json().message)
+          .to.equal("Street address, suburb and postcode are required");
+      });
+    language: text/javascript
+order: 1399753941726769
