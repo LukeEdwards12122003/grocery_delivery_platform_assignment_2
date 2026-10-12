@@ -41,7 +41,9 @@ describe('Notifications - Observer Pattern Tests', () => {
             body: {
                 item: 'Milk',
                 quantity: 2,
-                deliveryAddress: '123 Test Street'
+                streetAddress: '123 Test Street',
+                suburb: 'Brisbane', 
+                postcode: '4000'
             }
         };
 
@@ -58,6 +60,10 @@ describe('Notifications - Observer Pattern Tests', () => {
         const res = mockResponse();
 
         await addOrder(req, res);
+
+       
+        console.log('Returned status:', res.status.firstCall?.args[0]);
+        console.log('Returned response:', res.json.firstCall?.args[0]);
 
         expect(res.status.calledWith(201)).to.be.true;
         expect(notifyStub.calledOnce).to.be.true;
