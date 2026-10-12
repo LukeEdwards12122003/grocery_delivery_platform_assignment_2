@@ -11,6 +11,8 @@ import Profile from './pages/Profile';
 import CustomerHome from './pages/Customer_home';
 import StaffHome from './pages/StaffHome';
 
+import DeliveryOptions from "./pages/Delivery_options";
+
 function App() {
 
 const { user } = useAuth();
@@ -46,6 +48,15 @@ element={user ? <Profile /> : <Navigate to="/login" />}
 <Route
 path="/customer"
 element={user?.role === 'customer' ? <CustomerHome /> : <Navigate to="/login" />}
+/>
+
+<Route
+  path="/delivery-options"
+  element={
+    user?.role === 'customer'
+      ? <DeliveryOptions />
+      : <Navigate to="/login" />
+  }
 />
 
 <Route
