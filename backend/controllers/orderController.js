@@ -1,5 +1,8 @@
+
 const Order = require('../models/Orders');
 const orderEvents = require('../observers/orderEvents');
+const QuantityValidationHandler = require('../validation/QuantityValidationHandler')
+
 
 const getOrders = async (req, res) => {
     try {
@@ -18,29 +21,52 @@ const getOrders = async (req, res) => {
     }
 };
 const addOrder = async (req, res) => {
-    const { item, quantity, deliveryAddress } = req.body;
+  const { item, quantity, streetAddress, suburb, postcode } = req.body
     try {
         if (req.user.role !== 'customer') {
-            return res.status(403).json({ message: 'Only customers can place orders' });
+      return res
+        .status(403)
+        .json({ message: 'Only customers can place orders' })
+    }
+
+    const quantityHandler = new QuantityValidationHandler()
+    const quantityResult = quantityHandler.handle({
+      quantity,
+    })
+    if (!quantityResult.valid) {
+      return res.status(400).json({ message: quantityResult.message })
+    }
+
+    if (!item || !streetAddress || !suburb || !postcode) {
+      return res
+        .status(400)
+        .json({ message: 'Street address, suburb and postcode are required' })
+    }
+
+    if (!/^\d{4}$/.test(String(postcode))) {
+      return res.status(400).json({
+        message: 'Postcode must contain exactly four digits',
+      })
         }
-        if (!item || !quantity || !deliveryAddress || Number(quantity) <= 0) {
-            return res.status(400).json({ message: 'Please provide valid order details' });
-        }
-        const order = await Order.create({
-            customerId: req.user.id,
-            item,
-            quantity,
-            deliveryAddress,
-        });
+        
+const order = await Order.create({
+    customerId: req.user.id,
+    item,
+    quantity: Number(quantity),
+    streetAddress,
+    suburb,
+    postcode,
+});
 
-        await orderEvents.notify({
-            type: 'ORDER_PLACED',
-            orderId: order._id,
-            customerId: order.customerId
-        });
+await orderEvents.notify({
+    type: 'ORDER_PLACED',
+    orderId: order._id,
+    customerId: order.customerId
+});
+
+res.status(201).json(order);
 
 
-        res.status(201).json(order);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

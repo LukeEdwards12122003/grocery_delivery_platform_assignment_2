@@ -1,0 +1,37 @@
+$kind: http-request
+name: Verify Separate Address Fields
+url: "{{base_url}}/api/orders"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "item": "Milk",
+      "quantity": 2,
+      "streetAddress": "123 Test Street",
+      "suburb": "Brisbane City",
+      "postcode": "4000"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Order is accepted", function () {
+        pm.response.to.have.status(201);
+      });
+
+      const response = pm.response.json();
+
+      pm.test("Separate address fields are returned", function () {
+        pm.expect(response.streetAddress).to.eql("123 Test Street");
+        pm.expect(response.suburb).to.eql("Brisbane City");
+        pm.expect(response.postcode).to.eql("4000");
+      });
+    language: text/javascript
+order: 1791716769522

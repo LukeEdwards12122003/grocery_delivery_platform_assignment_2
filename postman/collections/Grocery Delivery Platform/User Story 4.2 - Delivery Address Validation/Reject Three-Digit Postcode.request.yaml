@@ -1,0 +1,34 @@
+$kind: http-request
+name: Reject Three-Digit Postcode
+url: "{{base_url}}/api/orders"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "item": "Milk",
+      "quantity": 2,
+      "streetAddress": "123 Test Street",
+      "suburb": "Brisbane City",
+      "postcode": "400"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Three-digit postcode is rejected", function () {
+        pm.response.to.have.status(400);
+      });
+
+      pm.test("Correct postcode error message is returned", function () {
+        pm.expect(pm.response.json().message)
+          .to.equal("Postcode must contain exactly four digits");
+      });
+    language: text/javascript
+order: 4178277897281111
