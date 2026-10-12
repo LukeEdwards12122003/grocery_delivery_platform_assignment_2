@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 
 const CustomerHome = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     item: '',
@@ -169,6 +171,13 @@ const CustomerHome = () => {
             ))
           )}
         </div>
+        <button
+          type="button"
+          onClick={() => navigate('/delivery-options')}
+          className="w-full bg-green-600 text-white p-2 rounded"
+        >
+          Proceed to Delivery Options
+        </button>
       </div>
     </div>
   );
