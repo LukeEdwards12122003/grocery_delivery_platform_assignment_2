@@ -1,12 +1,12 @@
 $kind: http-request
-name: Accept Another Supported Postcode
+name: Accept Supported Postcode 4005
 url: "{{base_url}}/api/orders"
 method: POST
 body:
   type: json
   content: |-
     {
-      "item": "Bread",
+      "item": "SupportedAreaTestItem4005",
       "quantity": 1,
       "streetAddress": "45 Queen Street",
       "suburb": "New Farm",

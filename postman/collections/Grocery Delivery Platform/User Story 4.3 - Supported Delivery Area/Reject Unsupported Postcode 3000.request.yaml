@@ -1,0 +1,34 @@
+$kind: http-request
+name: Reject Unsupported Postcode 3000
+url: "{{base_url}}/api/orders"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "item": "UnsupportedAreaTestItem3000",
+      "quantity": 1,
+      "streetAddress": "123 Test Street",
+      "suburb": "Melbourne City",
+      "postcode": "3000"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Unsupported postcode 3000 is rejected", function () {
+        pm.response.to.have.status(400);
+      });
+
+      pm.test("Correct delivery area error is returned", function () {
+        pm.expect(pm.response.json().message)
+          .to.equal("Delivery is not available in this area");
+      });
+    language: text/javascript
+order: 2237067655328871
