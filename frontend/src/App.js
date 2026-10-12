@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import CustomerHome from './pages/Customer_home';
 import StaffHome from './pages/StaffHome';
+import Notifications from './pages/Notifications';
 
 function App() {
 
@@ -41,6 +42,11 @@ user ? (
 <Route
 path="/profile"
 element={user ? <Profile /> : <Navigate to="/login" />}
+/>
+
+<Route
+  path="/notifications"
+  element={user ? <Notifications /> : <Navigate to="/login" />}
 />
 
 <Route

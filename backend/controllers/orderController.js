@@ -1,5 +1,8 @@
-const Order = require('../models/Orders')
+
+const Order = require('../models/Orders');
+const orderEvents = require('../observers/orderEvents');
 const QuantityValidationHandler = require('../validation/QuantityValidationHandler')
+
 
 const getOrders = async (req, res) => {
     try {
@@ -45,15 +48,25 @@ const addOrder = async (req, res) => {
         message: 'Postcode must contain exactly four digits',
       })
         }
-        const order = await Order.create({
-            customerId: req.user.id,
-            item,
-      quantity: Number(quantity),
-      streetAddress,
-      suburb,
-      postcode,
-    })
-    res.status(201).json(order)
+        
+const order = await Order.create({
+    customerId: req.user.id,
+    item,
+    quantity: Number(quantity),
+    streetAddress,
+    suburb,
+    postcode,
+});
+
+await orderEvents.notify({
+    type: 'ORDER_PLACED',
+    orderId: order._id,
+    customerId: order.customerId
+});
+
+res.status(201).json(order);
+
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -75,8 +88,20 @@ const updateOrderStatus = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
+        const previousStatus = order.status;
+
         order.status = status;
         const updatedOrder = await order.save();
+
+        if (previousStatus !== updatedOrder.status) {
+            await orderEvents.notify({
+                type: 'ORDER_STATUS_CHANGED',
+                orderId: updatedOrder._id,
+                customerId: updatedOrder.customerId,
+                status: updatedOrder.status
+            });
+        }
+
 
         res.json(updatedOrder);
     } catch (error) {
