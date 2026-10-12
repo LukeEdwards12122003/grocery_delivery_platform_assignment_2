@@ -1,5 +1,4 @@
 $kind: http-request
-name: Accept Supported Postcode
 url: "{{base_url}}/api/orders"
 method: POST
 body:

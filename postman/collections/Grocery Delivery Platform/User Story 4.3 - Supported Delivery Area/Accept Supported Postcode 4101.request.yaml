@@ -1,0 +1,39 @@
+$kind: http-request
+url: "{{base_url}}/api/orders"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "item": "SupportedAreaTestItem4101",
+      "quantity": 1,
+      "streetAddress": "123 Test Street",
+      "suburb": "West End",
+      "postcode": "4101"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Supported postcode 4101 is accepted", function () {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test("Correct postcode is returned", function () {
+        pm.expect(pm.response.json().postcode).to.eql("4101");
+      });
+
+      pm.test("Order is created with address details", function () {
+        const response = pm.response.json();
+
+        pm.expect(response.streetAddress).to.eql("123 Test Street");
+        pm.expect(response.suburb).to.eql("West End");
+      });
+    language: text/javascript
+order: 1895527968669498

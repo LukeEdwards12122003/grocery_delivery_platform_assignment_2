@@ -16,5 +16,21 @@ scripts:
       pm.test("Response is a list of orders", function () {
           pm.expect(pm.response.json()).to.be.an("array");
       });
+
+      pm.test("Unsupported order was not saved", function () {
+        const orders = pm.response.json();
+
+        pm.expect(
+          orders.some(order => order.item === "UnsupportedAreaTestItem")
+        ).to.eql(false);
+      });
+
+      pm.test("Unsupported postcode 3000/9999 order was not saved", function () {
+        const orders = pm.response.json();
+
+        pm.expect(
+          orders.some(order => order.item === "UnsupportedAreaTestItem3000" & "UnsupportedAreaTestItem9999")
+        ).to.eql(false);
+      });
     language: text/javascript
 order: 3934720038704322

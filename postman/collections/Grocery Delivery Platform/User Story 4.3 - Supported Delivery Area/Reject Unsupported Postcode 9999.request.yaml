@@ -1,13 +1,13 @@
 $kind: http-request
-name: Reject Unsupported Postcode
+name: Reject Unsupported Postcode 9999
 url: "{{base_url}}/api/orders"
 method: POST
 body:
   type: json
   content: |-
     {
-      "item": "Milk",
-      "quantity": 2,
+      "item": "UnsupportedAreaTestItem9999",
+      "quantity": 1,
       "streetAddress": "123 Test Street",
       "suburb": "Brisbane City",
       "postcode": "9999"
