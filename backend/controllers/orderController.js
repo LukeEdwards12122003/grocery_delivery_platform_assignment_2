@@ -1,8 +1,6 @@
-
 const Order = require('../models/Orders');
 const orderEvents = require('../observers/orderEvents');
-const QuantityValidationHandler = require('../validation/QuantityValidationHandler')
-
+const createOrderValidationChain = require('../validation/orderValidationChain')
 
 const getOrders = async (req, res) => {
     try {
@@ -29,24 +27,22 @@ const addOrder = async (req, res) => {
         .json({ message: 'Only customers can place orders' })
     }
 
-    const quantityHandler = new QuantityValidationHandler()
-    const quantityResult = quantityHandler.handle({
-      quantity,
-    })
-    if (!quantityResult.valid) {
-      return res.status(400).json({ message: quantityResult.message })
-    }
-
-    if (!item || !streetAddress || !suburb || !postcode) {
-      return res
-        .status(400)
-        .json({ message: 'Street address, suburb and postcode are required' })
-    }
-
-    if (!/^\d{4}$/.test(String(postcode))) {
+    if (!item) {
       return res.status(400).json({
-        message: 'Postcode must contain exactly four digits',
+        message: 'Please provide a valid item',
       })
+    }
+
+    const validationChain = createOrderValidationChain()
+    const validationResult = validationChain.handle({
+      item,
+      quantity,
+      streetAddress,
+      suburb,
+      postcode,
+    })
+    if (!validationResult.valid) {
+      return res.status(400).json({ message: validationResult.message })
         }
         
 const order = await Order.create({

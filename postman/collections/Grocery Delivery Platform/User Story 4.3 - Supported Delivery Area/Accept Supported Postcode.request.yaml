@@ -1,0 +1,33 @@
+$kind: http-request
+name: Accept Supported Postcode
+url: "{{base_url}}/api/orders"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "item": "Milk",
+      "quantity": 2,
+      "streetAddress": "123 Test Street",
+      "suburb": "Brisbane City",
+      "postcode": "4000"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Supported postcode is accepted", function () {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test("Order contains the supported postcode", function () {
+        pm.expect(pm.response.json().postcode).to.eql("4000");
+      });
+    language: text/javascript
+order: 1791797237236

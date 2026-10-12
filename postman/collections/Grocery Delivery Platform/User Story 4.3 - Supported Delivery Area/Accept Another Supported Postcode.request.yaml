@@ -1,0 +1,40 @@
+$kind: http-request
+name: Accept Another Supported Postcode
+url: "{{base_url}}/api/orders"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "item": "Bread",
+      "quantity": 1,
+      "streetAddress": "45 Queen Street",
+      "suburb": "New Farm",
+      "postcode": "4005"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Supported postcode 4005 is accepted", function () {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test("Correct postcode is returned", function () {
+        pm.expect(pm.response.json().postcode).to.eql("4005");
+      });
+
+      pm.test("Order is created with address details", function () {
+        const response = pm.response.json();
+
+        pm.expect(response.streetAddress).to.eql("45 Queen Street");
+        pm.expect(response.suburb).to.eql("New Farm");
+      });
+    language: text/javascript
+order: 1524548790956861
