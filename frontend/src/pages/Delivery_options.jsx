@@ -146,12 +146,12 @@ function DeliveryOptions() {
                                         <strong>Delivery Method:</strong> {order.deliveryMethod || 'Not specified'}
                                     </p>
                                     {order.status !== 'Draft' && (
-                                    <p>
-                                        <strong>Delivery Address:</strong>{' '}
-                                        {order.streetAddress && order.suburb && order.postcode
-                                            ? `${order.streetAddress}, ${order.suburb}, ${order.postcode}`
+                                        <p>
+                                            <strong>Delivery Address:</strong>{' '}
+                                            {order.streetAddress && order.suburb && order.postcode
+                                                ? `${order.streetAddress}, ${order.suburb}, ${order.postcode}`
                                                 : order.deliveryAddress }
-                                    </p>
+                                        </p>
                                     )}
                                 </div>
                             </div>
