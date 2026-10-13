@@ -10,8 +10,9 @@ const Notification = require('../models/Notification');
 const orderEvents = require('../observers/orderEvents');
 
 const {
-    addOrder,
-    updateOrderStatus
+  addOrder,
+  updateOrderStatus,
+  updateDeliveryMethod
 } = require('../controllers/orderController');
 
 const {
@@ -32,48 +33,143 @@ describe('Notifications - Observer Pattern Tests', () => {
         sinon.restore();
     });
 
-    it('should publish ORDER_PLACED when a customer places an order', async () => {
-        const customerId = new mongoose.Types.ObjectId().toString();
-        const orderId = new mongoose.Types.ObjectId().toString();
+
+    it('should create a draft order without publishing ORDER_PLACED', async () => {
+    const customerId = new mongoose.Types.ObjectId();
+
+    const draftOrder = {
+        _id: new mongoose.Types.ObjectId(),
+        customerId,
+        item: 'Milk',
+        quantity: 2,
+        status: 'Draft'
+    };
+
+    const createStub = sinon.stub(Order, 'create').resolves(draftOrder);
+    const notifyStub = sinon.stub(orderEvents, 'notify').resolves();
+
+    const req = {
+        user: {
+        id: customerId,
+        role: 'customer'
+        },
+        body: {
+        item: 'Milk',
+        quantity: 2,
+        streetAddress: '123 Test Street',
+        suburb: 'Brisbane',
+        postcode: '4000'
+        }
+    };
+
+    const res = mockResponse();
+
+    await addOrder(req, res);
+
+    expect(res.status.calledWith(201)).to.be.true;
+    expect(createStub.calledOnce).to.be.true;
+    expect(res.json.calledWith(draftOrder)).to.be.true;
+    expect(notifyStub.notCalled).to.be.true;
+    });
+
+
+    it('should publish ORDER_PLACED once after draft checkout', async () => {
+        const customerId = new mongoose.Types.ObjectId();
+        const orderId = new mongoose.Types.ObjectId();
+
+        // Mock an existing draft order
+        const draftOrder = {
+            _id: orderId,
+            customerId,
+            item: 'Milk',
+            quantity: 2,
+            status: 'Draft',
+            save: sinon.stub().resolvesThis()
+        };
+
+        // Mock database lookup
+        sinon.stub(Order, 'find').resolves([draftOrder]);
+
+        // Monitor the Observer Pattern event
+        const notifyStub = sinon.stub(orderEvents, 'notify').resolves();
 
         const req = {
-            user: { id: customerId, role: 'customer' },
+            user: {
+            id: customerId,
+            role: 'customer'
+            },
             body: {
-                item: 'Milk',
-                quantity: 2,
-                streetAddress: '123 Test Street',
-                suburb: 'Brisbane', 
-                postcode: '4000'
+            orderIds: [orderId.toString()],
+            deliveryMethod: 'standard',
+            streetAddress: '123 Test Street',
+            suburb: 'Brisbane',
+            postcode: '4000'
             }
         };
 
-        const order = {
-            _id: orderId,
-            customerId,
-            ...req.body,
-            status: 'Pending'
-        };
-
-        sinon.stub(Order, 'create').resolves(order);
-        const notifyStub = sinon.stub(orderEvents, 'notify').resolves();
-
         const res = mockResponse();
 
-        await addOrder(req, res);
+        // Perform checkout
+        await updateDeliveryMethod(req, res);
 
-       
-        console.log('Returned status:', res.status.firstCall?.args[0]);
-        console.log('Returned response:', res.json.firstCall?.args[0]);
+        // Verify the order was checked out
+        expect(res.json.calledOnce).to.be.true;
+        expect(draftOrder.status).to.equal('Pending');
+        expect(draftOrder.save.calledOnce).to.be.true;
 
-        expect(res.status.calledWith(201)).to.be.true;
+        // Verify one ORDER_PLACED event was published
         expect(notifyStub.calledOnce).to.be.true;
-
         expect(notifyStub.firstCall.args[0].type)
             .to.equal('ORDER_PLACED');
-
         expect(notifyStub.firstCall.args[0].orderId)
             .to.equal(orderId);
+        expect(notifyStub.firstCall.args[0].customerId)
+            .to.equal(customerId);
+        });
+
+
+    it('should not publish ORDER_PLACED again for a pending order', async () => {
+    const customerId = new mongoose.Types.ObjectId();
+    const orderId = new mongoose.Types.ObjectId();
+
+    const pendingOrder = {
+        _id: orderId,
+        customerId,
+        item: 'Milk',
+        quantity: 2,
+        status: 'Pending',
+        save: sinon.stub().resolvesThis()
+    };
+
+    sinon.stub(Order, 'find').resolves([pendingOrder]);
+    const notifyStub = sinon.stub(orderEvents, 'notify').resolves();
+
+    const req = {
+        user: {
+        id: customerId,
+        role: 'customer'
+        },
+        body: {
+        orderIds: [orderId.toString()],
+        deliveryMethod: 'standard',
+        streetAddress: '123 Test Street',
+        suburb: 'Brisbane',
+        postcode: '4000'
+        }
+    };
+
+    const res = mockResponse();
+
+    await updateDeliveryMethod(req, res);
+
+    expect(res.json.calledOnce).to.be.true;
+    expect(pendingOrder.save.calledOnce).to.be.true;
+    expect(pendingOrder.status).to.equal('Pending');
+
+    // No new ORDER_PLACED event for an existing pending order
+    expect(notifyStub.notCalled).to.be.true;
     });
+
 
     it('should reject invalid orders without publishing an event', async () => {
         const req = {
