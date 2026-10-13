@@ -1,0 +1,35 @@
+$kind: http-request
+name: Checkout Draft Order with Separate Address Fields
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+      "orderIds": ["6acec2a2dbd81f83ef0f6719"],
+      "deliveryMethod": "standard",
+      "streetAddress": "12 Main Street",
+      "suburb": "Brisbane",
+      "postcode": "4000"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Checkout succeeds', () => {
+        pm.response.to.have.status(200);
+      });
+
+      const orders = pm.response.json();
+
+      pm.test('Address fields are returned separately', () => {
+        pm.expect(orders[0].streetAddress).to.eql('12 Main Street');
+        pm.expect(orders[0].suburb).to.eql('Brisbane');
+        pm.expect(orders[0].postcode).to.eql('4000');
+        pm.expect(orders[0].status).to.eql('Pending');
+      });
+    language: text/javascript
+order: 4399755541372668
