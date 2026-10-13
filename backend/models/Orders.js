@@ -22,6 +22,10 @@ const orderSchema = new mongoose.Schema({
     enum: ['Pending', 'Preparing', 'Completed'],
     default: 'Pending',
   },
-})
+  deliveryMethod: {
+    type: String,
+    enum: ['standard', 'express'],
+  }
+});
 
 module.exports = mongoose.model('Order', orderSchema);
