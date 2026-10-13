@@ -10,7 +10,11 @@ function DeliveryOptions() {
     const [deliveryMethod, setDeliveryMethod] = useState('');
     const [orders, setOrders] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState([]);
-
+    const [address, setAddress] = useState({
+    streetAddress: '',
+    suburb: '',
+    postcode: '',
+  });
 
     const fetchOrders = async () => {
         try {
@@ -51,17 +55,37 @@ function DeliveryOptions() {
             return;
         }
 
+        const cleanedAddress = {
+          streetAddress: address.streetAddress.trim(),
+          suburb: address.suburb.trim(),
+          postcode: address.postcode.trim(),
+        }
+        if (
+          !cleanedAddress.streetAddress ||
+          !cleanedAddress.suburb ||
+          !/^\d{4}$/.test(cleanedAddress.postcode)
+        ) {
+          alert('Enter a street address, suburb, and four-digit postcode.')
+          return
+        }
+
         try {
             await axiosInstance.patch('/api/orders/delivery-method', {
                 orderIds: selectedOrders,
-                deliveryMethod: deliveryMethod
-            }, {
-                headers: { Authorization: `Bearer ${user.token}` }
-            });
-            alert('Delivery method updated successfully.');
+                deliveryMethod: deliveryMethod,
+                ...cleanedAddress,
+              },
+              {
+                headers: { Authorization: `Bearer ${user.token}` },
+              },
+            )
+            alert('Order placed successfully.');
             navigate('/check-delivery', { state: { selectedOrders, deliveryMethod } });
         } catch (error) {
-            alert('Failed to update delivery method. Please try again.');
+            alert(
+              error.response?.data?.message ||
+                'Failed to place the order. Please try again.',
+            )
         }
     };
 
@@ -103,6 +127,7 @@ function DeliveryOptions() {
                                     name="delivery"
                                     value={order._id}
                                     checked={selectedOrders.includes(order._id)}
+                    onClick={(e) => e.stopPropagation()}
                                     onChange={() => 
                                         setSelectedOrders(prev => 
                                             prev.includes(order._id)
@@ -167,6 +192,44 @@ function DeliveryOptions() {
                     </div>
                     ))}
                 </div>
+
+          {deliveryMethod && (
+            <section className="mt-6">
+              <h2 className="text-lg font-bold mb-4">Delivery Address</h2>
+
+              <input
+                type="text"
+                placeholder="Street Address"
+                value={address.streetAddress}
+                onChange={(e) =>
+                  setAddress({ ...address, streetAddress: e.target.value })
+                }
+                className="w-full mb-4 p-2 border rounded"
+              />
+
+              <input
+                type="text"
+                placeholder="Suburb"
+                value={address.suburb}
+                onChange={(e) =>
+                  setAddress({ ...address, suburb: e.target.value })
+                }
+                className="w-full mb-4 p-2 border rounded"
+              />
+
+              <input
+                type="text"
+                placeholder="Postcode"
+                inputMode="numeric"
+                maxLength={4}
+                value={address.postcode}
+                onChange={(e) =>
+                  setAddress({ ...address, postcode: e.target.value })
+                }
+                className="w-full mb-4 p-2 border rounded"
+              />
+            </section>
+          )}
 
             <div className="mt-6 mb-6 border-t"></div>
 

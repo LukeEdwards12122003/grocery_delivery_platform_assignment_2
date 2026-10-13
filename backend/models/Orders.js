@@ -6,21 +6,20 @@ const orderSchema = new mongoose.Schema({
     quantity: { type: Number, required: true },
   streetAddress: {
     type: String,
-    required: true,
+    trim: true,
   },
   suburb: {
     type: String,
-    required: true,
+    trim: true,
   },
   postcode: {
     type: String,
-    required: true,
     match: /^\d{4}$/,
   },
   status: {
     type: String,
-    enum: ['Pending', 'Preparing', 'Completed'],
-    default: 'Pending',
+    enum: ['Draft', 'Pending', 'Preparing', 'Completed'],
+    default: 'Draft',
   },
   deliveryMethod: {
     type: String,

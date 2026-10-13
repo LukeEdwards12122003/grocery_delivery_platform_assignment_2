@@ -13,9 +13,7 @@ const SUPPORTED_POSTCODES = new Set([
 
 class DeliveryAreaValidationHandler extends ValidationHandler {
   check(order) {
-    // Pickup orders do not require delivery-area validation
-    // NEED TO CHNAGE order.deliveryMethod AFTER THE EPIC 2 IS DONE
-    if (order.deliveryMethod === 'pickup') {
+    if (!order.deliveryMethod) {
       return null
     }
 

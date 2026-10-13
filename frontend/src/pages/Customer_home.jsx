@@ -10,9 +10,6 @@ const CustomerHome = () => {
   const [formData, setFormData] = useState({
     item: '',
     quantity: 1,
-    streetAddress: '',
-    suburb: '',
-    postcode: '',
   })
 
   const [orders, setOrders] = useState([]);
@@ -39,28 +36,24 @@ const CustomerHome = () => {
     const orderData = {
       item: formData.item,
       quantity: Number(formData.quantity),
-      streetAddress: formData.streetAddress,
-      suburb: formData.suburb,
-      postcode: formData.postcode,
     }
 
     try {
       await axiosInstance.post('/api/orders', orderData, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      alert('Order placed successfully.');
+      alert(
+        'Item added to checkout. Choose delivery options to place your order.',
+      )
 
       setFormData({
         item: '',
         quantity: 1,
-        streetAddress: '',
-        suburb: '',
-        postcode: '',
       })
 
       fetchOrders();
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to place order. Please try again.');
+      alert(error.response?.data?.message || 'Failed to add item. Please try again.');
     }
   };
 
@@ -71,7 +64,7 @@ const CustomerHome = () => {
         <p className="mb-6">Welcome, {user.name}.</p>
 
         <form onSubmit={handleSubmit}>
-          <h2 className="text-xl font-bold mb-4">Place Grocery Order</h2>
+          <h2 className="text-xl font-bold mb-4">Add Grocery Item</h2>
 
           <select
             value={formData.item}
@@ -99,48 +92,11 @@ const CustomerHome = () => {
             required
           />
 
-          <input
-            type="text"
-            placeholder="Street Address"
-            value={formData.streetAddress}
-            onChange={(e) =>
-              setFormData({ ...formData, streetAddress: e.target.value })
-            }
-            className="w-full mb-4 p-2 border rounded"
-            required
-          />
-
-          <input
-            type="text"
-            placeholder="Suburb"
-            value={formData.suburb}
-            onChange={(e) =>
-              setFormData({ ...formData, suburb: e.target.value })
-            }
-            className="w-full mb-4 p-2 border rounded"
-            required
-          />
-
-          <input
-            type="text"
-            placeholder="Postcode"
-            value={formData.postcode}
-            onChange={(e) =>
-              setFormData({ ...formData, postcode: e.target.value })
-            }
-            className="w-full mb-4 p-2 border rounded"
-            inputMode="numeric"
-            maxLength="4"
-            pattern="[0-9]{4}"
-            title="Postcode must contain exactly four digits"
-            required
-          />
-
           <button
             type="submit"
             className="w-full bg-green-600 text-white p-2 rounded"
           >
-            Place Order
+            Add Grocery Item
           </button>
         </form>
 
@@ -162,7 +118,7 @@ const CustomerHome = () => {
                   <strong>Delivery Address:</strong>{' '}
                   {order.streetAddress && order.suburb && order.postcode
                     ? `${order.streetAddress}, ${order.suburb}, ${order.postcode}`
-                    : order.deliveryAddress || 'Address unavailable'}
+                    : order.deliveryAddress || 'Enter address at checkout.'}
                 </p>
                 <p>
                   <strong>Status:</strong> {order.status}
