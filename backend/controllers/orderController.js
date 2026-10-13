@@ -1,3 +1,4 @@
+
 const Order = require('../models/Orders');
 const orderEvents = require('../observers/orderEvents');
 const createOrderValidationChain = require('../validation/orderValidationChain')
@@ -22,6 +23,7 @@ const getOrders = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 const addOrder = async (req, res) => {
   const { item, quantity } = req.body
     try {
@@ -45,7 +47,7 @@ const addOrder = async (req, res) => {
     if (!validationResult.valid) {
       return res.status(400).json({ message: validationResult.message })
         }
-        
+
 const order = await Order.create({
     customerId: req.user.id,
     item,
@@ -67,6 +69,47 @@ res.status(201).json(order);
     }
 };
 
+const cancelOrder = async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({ message: 'Only customers can cancel orders' });
+        }
+
+        // Update only the logged-in customer's Pending order.
+        // The status condition prevents two simultaneous requests from cancelling it twice.
+        const cancelledOrder = await Order.findOneAndUpdate(
+            { _id: req.params.id, customerId: req.user.id, status: 'Pending' },
+            { $set: { status: 'Cancelled' } },
+            { new: true, runValidators: true }
+        );
+
+        if (!cancelledOrder) {
+            const order = await Order.findById(req.params.id);
+            if (!order || String(order.customerId) !== String(req.user.id)) {
+                return res.status(404).json({ message: 'Order not found' });
+            }
+            return res.status(400).json({ message: 'Only pending orders can be cancelled' });
+        }
+
+        try {
+            await orderEvents.notify({
+                type: 'ORDER_CANCELLED',
+                orderId: cancelledOrder._id,
+                customerId: cancelledOrder.customerId
+            });
+        } catch (notificationError) {
+            console.error('Failed to send cancellation notification:', notificationError);
+        }
+
+        return res.json({ message: 'Order cancelled successfully', order: cancelledOrder });
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ message: 'Invalid order ID' });
+        }
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 const updateOrderStatus = async (req, res) => {
     const { status } = req.body;
     try {
@@ -84,6 +127,10 @@ const updateOrderStatus = async (req, res) => {
         }
 
       // Draft orders have not completed checkout and validation, so staff cannot process them.
+      if (order.status === 'Cancelled') {
+        return res.status(400).json({ message: 'Cancelled orders cannot be processed' });
+      }
+
       if (order.status === 'Draft') {
         return res.status(400).json({
           message: 'Complete checkout before processing this order',
@@ -201,4 +248,4 @@ const updateDeliveryMethod = async (req, res) => {
     }
 };
 
-module.exports = { getOrders, addOrder, updateOrderStatus, updateDeliveryMethod };
+module.exports = { getOrders, addOrder, updateOrderStatus, updateDeliveryMethod, cancelOrder };

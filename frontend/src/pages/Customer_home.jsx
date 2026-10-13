@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -54,6 +55,23 @@ const CustomerHome = () => {
       fetchOrders();
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to add item. Please try again.');
+    }
+  };
+
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm('Are you sure you want to cancel this order?')) {
+      return;
+    }
+
+    try {
+      await axiosInstance.patch(`/api/orders/${orderId}/cancel`, {}, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      alert('Order cancelled successfully.');
+      await fetchOrders();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to cancel order. Please try again.');
+      await fetchOrders();
     }
   };
 
@@ -123,6 +141,15 @@ const CustomerHome = () => {
                 <p>
                   <strong>Status:</strong> {order.status}
                 </p>
+                {order.status === 'Pending' && (
+                  <button
+                    type="button"
+                    onClick={() => handleCancelOrder(order._id)}
+                    className="mt-3 bg-red-600 text-white px-4 py-2 rounded"
+                  >
+                    Cancel Order
+                  </button>
+                )}
               </div>
             ))
           )}

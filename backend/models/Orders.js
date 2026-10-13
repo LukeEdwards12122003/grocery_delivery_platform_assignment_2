@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
@@ -18,7 +19,7 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Draft', 'Pending', 'Preparing', 'Completed'],
+    enum: ['Draft', 'Pending', 'Preparing', 'Completed', 'Cancelled'],
     default: 'Draft',
   },
   deliveryMethod: {
