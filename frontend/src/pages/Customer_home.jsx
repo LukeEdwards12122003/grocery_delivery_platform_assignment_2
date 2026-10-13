@@ -132,12 +132,14 @@ const CustomerHome = () => {
                 <p>
                   <strong>Quantity:</strong> {order.quantity}
                 </p>
+                {order.status !== 'Draft' && (
                 <p>
                   <strong>Delivery Address:</strong>{' '}
                   {order.streetAddress && order.suburb && order.postcode
                     ? `${order.streetAddress}, ${order.suburb}, ${order.postcode}`
-                    : order.deliveryAddress || 'Enter address at checkout.'}
+                      : order.deliveryAddress}
                 </p>
+                )}
                 <p>
                   <strong>Status:</strong> {order.status}
                 </p>
