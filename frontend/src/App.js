@@ -12,6 +12,7 @@ import CustomerHome from './pages/Customer_home';
 import StaffHome from './pages/StaffHome';
 
 import DeliveryOptions from "./pages/Delivery_options";
+import CheckDelivery from "./pages/Check_Delivery";
 
 function App() {
 
@@ -57,6 +58,15 @@ element={user?.role === 'customer' ? <CustomerHome /> : <Navigate to="/login" />
       ? <DeliveryOptions />
       : <Navigate to="/login" />
   }
+/>
+
+<Route
+    path="/check-delivery"
+    element={
+      user?.role === 'customer'
+        ? <CheckDelivery />
+        : <Navigate to="/login" />
+    }
 />
 
 <Route
