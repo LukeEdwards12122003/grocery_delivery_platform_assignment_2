@@ -8,7 +8,7 @@ describe('Order validation chain', () => {
     const result = chain.handle({
       item: 'Milk',
       quantity: 2,
-      deliveryMethod: 'delivery',
+      deliveryMethod: 'standard',
       streetAddress: '123 Test Street',
       suburb: 'Brisbane City',
       postcode: '4000',
@@ -23,7 +23,7 @@ describe('Order validation chain', () => {
     const result = chain.handle({
       item: 'Milk',
       quantity: 11,
-      deliveryMethod: 'delivery',
+      deliveryMethod: 'standard',
       streetAddress: '123 Test Street',
       suburb: 'Brisbane City',
       postcode: '4000',
@@ -39,22 +39,62 @@ describe('Order validation chain', () => {
     const result = chain.handle({
       item: 'Milk',
       quantity: 11,
-      deliveryMethod: 'delivery',
+      deliveryMethod: 'standard',
     })
 
     expect(result.valid).to.equal(false)
     expect(result.message).to.equal('The maximum quantity is 10')
   })
 
-  it('allows pickup orders without delivery address details', () => {
+  it('rejects a postcode outside the supported range', () => {
     const chain = createOrderValidationChain()
 
     const result = chain.handle({
       item: 'Milk',
       quantity: 2,
-      deliveryMethod: 'pickup',
+      deliveryMethod: 'standard',
+      streetAddress: '123 Test Street',
+      suburb: 'Brisbane City',
+      postcode: '9999',
     })
 
-    expect(result.valid).to.equal(true)
+    expect(result.valid).to.equal(false)
+    expect(result.message).to.equal('Delivery is not available in this area')
   })
+
+  it('checks the address before the delivery area', () => {
+    const chain = createOrderValidationChain()
+
+    const result = chain.handle({
+      item: 'Milk',
+      quantity: 2,
+      deliveryMethod: 'standard',
+      streetAddress: '',
+      suburb: 'Brisbane City',
+      postcode: '9999',
+    })
+
+    expect(result.valid).to.equal(false)
+    expect(result.message).to.equal(
+      'Street address, suburb and postcode are required',
+    )
+  })
+
+    it('checks postcode format before the delivery area', () => {
+      const chain = createOrderValidationChain()
+
+      const result = chain.handle({
+        item: 'Milk',
+        quantity: 2,
+        deliveryMethod: 'standard',
+        streetAddress: '123 Test Street',
+        suburb: 'Brisbane City',
+        postcode: '40A0',
+      })
+
+      expect(result.valid).to.equal(false)
+      expect(result.message).to.equal(
+        'Postcode must contain exactly four digits',
+      )
+    })
 })
