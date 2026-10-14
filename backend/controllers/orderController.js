@@ -7,7 +7,6 @@ const getOrders = async (req, res) => {
     try {
         let orders;
 
-      // Leave the customer query unchanged so customers can still see their draft orders in checkout.
         if (req.user.role === 'staff') {
         orders = await Order.find({ status: { $ne: 'Draft' } }).populate(
           'customerId',
@@ -55,17 +54,51 @@ const order = await Order.create({
   status: 'Draft',
 })
 
-// await orderEvents.notify({
-//     type: 'ORDER_PLACED',
-//     orderId: order._id,
-//     customerId: order.customerId
-// });
 
 res.status(201).json(order);
 
 
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+const editPendingOrder = async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({ message: 'Only customers can edit orders' });
+        }
+        // Only allow editing of the logged-in customer's Pending order.
+        const { item, quantity } = req.body;
+        const allowedItems = ['Milk', 'Bread', 'Eggs', 'Apples', 'Rice'];
+        if (typeof item !== 'string' || !allowedItems.includes(item)) {
+            return res.status(400).json({ message: 'Please select a valid grocery item' });
+        }
+        if (typeof quantity !== 'number' || !Number.isInteger(quantity) || quantity < 1 || quantity > 10) {
+            return res.status(400).json({ message: 'Quantity must be a whole number between 1 and 10' });
+        }
+
+        // Compare the current status within the update to block changes after acceptance.
+        const updatedOrder = await Order.findOneAndUpdate(
+            { _id: req.params.id, customerId: req.user.id, status: 'Pending' },
+            { $set: { item, quantity } },
+            { new: true, runValidators: true }
+        );
+        // If the order was not found or is not pending, check if it exists and belongs to the user, then return an appropriate message.
+        if (!updatedOrder) {
+            const order = await Order.findById(req.params.id);
+            if (!order || String(order.customerId) !== String(req.user.id)) {
+                return res.status(404).json({ message: 'Order not found' });
+            }
+            return res.status(400).json({ message: 'Only pending orders can be edited' });
+        }
+
+        return res.json({ message: 'Order updated successfully', order: updatedOrder });
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ message: 'Invalid order ID' });
+        }
+        return res.status(500).json({ message: error.message });
     }
 };
 
@@ -248,4 +281,4 @@ const updateDeliveryMethod = async (req, res) => {
     }
 };
 
-module.exports = { getOrders, addOrder, updateOrderStatus, updateDeliveryMethod, cancelOrder };
+module.exports = { getOrders, addOrder, updateOrderStatus, updateDeliveryMethod, cancelOrder, editPendingOrder };
