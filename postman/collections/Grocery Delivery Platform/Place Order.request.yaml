@@ -8,8 +8,8 @@ body:
   type: json
   content: |-
     {
-      "item": "Milk",
-      "quantity": 8
+      "item": "Eggs",
+      "quantity": 5
     }
 auth:
   type: noauth
@@ -23,8 +23,8 @@ scripts:
       pm.test("Created order has the correct details", function () {
           const order = pm.response.json();
 
-          pm.expect(order.item).to.equal("Milk");
-          pm.expect(order.quantity).to.equal(8);
+          pm.expect(order.item).to.equal("Eggs");
+          pm.expect(order.quantity).to.equal(5);
           pm.expect(order.status).to.equal("Draft");
           pm.expect(order._id).to.be.a("string").and.not.empty;
       });

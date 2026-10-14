@@ -1,14 +1,14 @@
 $kind: http-request
 name: Reject Unsupported Postcode 9999
-url: "{{base_url}}/api/orders"
-method: POST
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
 body:
   type: json
   content: |-
     {
-      "item": "UnsupportedAreaTestItem9999",
-      "quantity": 1,
-      "streetAddress": "123 Test Street",
+      "orderIds": ["6acec2b1dbd81f83ef0f671c"],
+      "deliveryMethod": "standard",
+      "streetAddress": "12 Main Street",
       "suburb": "Brisbane City",
       "postcode": "9999"
     }
@@ -22,13 +22,15 @@ scripts:
     language: text/javascript
   - type: afterResponse
     code: |-
-      pm.test("Unsupported postcode is rejected", function () {
+      pm.test('Unsupported postcode 9999 is rejected', () => {
         pm.response.to.have.status(400);
       });
 
-      pm.test("Correct delivery area error is returned", function () {
-        pm.expect(pm.response.json().message)
-          .to.equal("Delivery is not available in this area");
+      pm.test('API returns the unsupported-area message', () => {
+        const response = pm.response.json();
+        pm.expect(response.message).to.eql(
+          'Delivery is not available in this area'
+        );
       });
     language: text/javascript
 order: 1911744728695979

@@ -1,15 +1,15 @@
 $kind: http-request
 name: Accept Supported Postcode 4005
-url: "{{base_url}}/api/orders"
-method: POST
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
 body:
   type: json
   content: |-
     {
-      "item": "SupportedAreaTestItem4005",
-      "quantity": 1,
-      "streetAddress": "45 Queen Street",
-      "suburb": "New Farm",
+      "orderIds": ["6aced4cedbd81f83ef0f67a3"],
+      "deliveryMethod": "standard",
+      "streetAddress": "12 Main Street",
+      "suburb": "West End",
       "postcode": "4005"
     }
 auth:
@@ -22,19 +22,14 @@ scripts:
     language: text/javascript
   - type: afterResponse
     code: |-
-      pm.test("Supported postcode 4005 is accepted", function () {
-        pm.response.to.have.status(201);
+      pm.test('Supported postcode is accepted', () => {
+        pm.response.to.have.status(200);
       });
 
-      pm.test("Correct postcode is returned", function () {
-        pm.expect(pm.response.json().postcode).to.eql("4005");
-      });
+      const orders = pm.response.json();
 
-      pm.test("Order is created with address details", function () {
-        const response = pm.response.json();
-
-        pm.expect(response.streetAddress).to.eql("45 Queen Street");
-        pm.expect(response.suburb).to.eql("New Farm");
+      pm.test('Order contains the supported postcode', () => {
+        pm.expect(orders[0].postcode).to.eql('4005');
       });
     language: text/javascript
 order: 1524548790956861
