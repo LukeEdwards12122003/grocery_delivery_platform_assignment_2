@@ -1,27 +1,18 @@
 const ValidationHandler = require('./ValidationHandler')
 
-// NEED TO COME BACK HERE LATER
-const SUPPORTED_POSTCODES = new Set([
-  '4000', // Brisbane City
-  '4005', // New Farm
-  '4006', // Fortitude Valley
-  '4101', // West End
-  '4170', // Morningside
-  '4171', // Bulimba
-  '4172', // Carina
-])
-
 class DeliveryAreaValidationHandler extends ValidationHandler {
   check(order) {
-    // Pickup orders do not require delivery-area validation
-    // NEED TO CHNAGE order.deliveryMethod AFTER THE EPIC 2 IS DONE
-    if (order.deliveryMethod === 'pickup') {
+    if (!order.deliveryMethod) {
       return null
     }
 
     const postcode = String(order.postcode)
-    // if the input postcode does not match with supported postcode
-    if (!SUPPORTED_POSTCODES.has(postcode)) {
+    const postcodeNumber = Number(postcode)
+    // Reject postcodes outside the supported range of 4000–4999.
+    if (
+      !/^\d{4}$/.test(postcode) ||
+      postcodeNumber < 4000 || postcodeNumber > 4999
+    ) {
       return 'Delivery is not available in this area'
     }
 

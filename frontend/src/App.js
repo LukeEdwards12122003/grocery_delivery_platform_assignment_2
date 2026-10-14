@@ -10,6 +10,10 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import CustomerHome from './pages/Customer_home';
 import StaffHome from './pages/StaffHome';
+import Notifications from './pages/Notifications';
+
+import DeliveryOptions from "./pages/Delivery_options";
+import CheckDelivery from "./pages/Check_Delivery";
 
 function App() {
 
@@ -44,8 +48,31 @@ element={user ? <Profile /> : <Navigate to="/login" />}
 />
 
 <Route
+  path="/notifications"
+  element={user ? <Notifications /> : <Navigate to="/login" />}
+/>
+
+<Route
 path="/customer"
 element={user?.role === 'customer' ? <CustomerHome /> : <Navigate to="/login" />}
+/>
+
+<Route
+  path="/delivery-options"
+  element={
+    user?.role === 'customer'
+      ? <DeliveryOptions />
+      : <Navigate to="/login" />
+  }
+/>
+
+<Route
+    path="/check-delivery"
+    element={
+      user?.role === 'customer'
+        ? <CheckDelivery />
+        : <Navigate to="/login" />
+    }
 />
 
 <Route

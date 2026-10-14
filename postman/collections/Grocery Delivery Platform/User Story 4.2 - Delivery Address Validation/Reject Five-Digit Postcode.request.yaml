@@ -1,0 +1,33 @@
+$kind: http-request
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+      "orderIds": ["6acec2b1dbd81f83ef0f671c"],
+      "deliveryMethod": "standard",
+      "streetAddress": "12 Main Street",
+      "suburb": "Brisbane",
+      "postcode": "40000"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Invalid postcode is rejected", function () {
+        pm.response.to.have.status(400);
+      });
+
+      pm.test("Correct postcode error message is returned", function () {
+        pm.expect(pm.response.json().message)
+          .to.equal("Postcode must contain exactly four digits");
+      });
+    language: text/javascript
+order: 4178804651516971

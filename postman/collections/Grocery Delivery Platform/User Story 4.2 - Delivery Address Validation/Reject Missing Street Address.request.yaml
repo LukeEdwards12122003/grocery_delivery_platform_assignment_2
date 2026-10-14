@@ -1,0 +1,36 @@
+$kind: http-request
+name: Reject Missing Street Address
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+      "orderIds": ["6acec2b1dbd81f83ef0f671c"],
+      "deliveryMethod": "standard",
+      "streetAddress": "",
+      "suburb": "Brisbane",
+      "postcode": "4000"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test('Missing street address returns 400', () => {
+        pm.response.to.have.status(400);
+      });
+
+      pm.test('API returns the required-address message', () => {
+        const response = pm.response.json();
+        pm.expect(response.message).to.eql(
+          'Street address, suburb and postcode are required'
+        );
+      });
+    language: text/javascript
+order: 163334253855063

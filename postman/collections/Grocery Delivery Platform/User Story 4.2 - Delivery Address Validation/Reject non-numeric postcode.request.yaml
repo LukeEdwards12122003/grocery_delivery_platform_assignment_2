@@ -1,0 +1,36 @@
+$kind: http-request
+name: Reject non-numeric postcode
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+      "orderIds": ["6acec2b1dbd81f83ef0f671c"],
+      "deliveryMethod": "standard",
+      "streetAddress": "12 Main Street",
+      "suburb": "Brisbane",
+      "postcode": "40A0"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test('Non-numeric postcode is rejected', () => {
+        pm.response.to.have.status(400);
+      });
+
+      pm.test('API returns the postcode format message', () => {
+        const response = pm.response.json();
+        pm.expect(response.message).to.eql(
+          'Postcode must contain exactly four digits'
+        );
+      });
+    language: text/javascript
+order: 4179695503108160

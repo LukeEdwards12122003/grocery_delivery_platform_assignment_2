@@ -2,9 +2,7 @@ const ValidationHandler = require('./ValidationHandler')
 
 class AddressValidationHandler extends ValidationHandler {
   check(order) {
-    // Pickup orders do not require delivery address details
-    // NEED TO CHNAGE order.deliveryMethod AFTER THE EPIC 2 IS DONE
-    if (order.deliveryMethod === 'pickup') {
+    if (!order.deliveryMethod) {
       return null
     }
 

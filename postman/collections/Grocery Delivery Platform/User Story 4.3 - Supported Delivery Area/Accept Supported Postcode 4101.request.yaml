@@ -1,0 +1,35 @@
+$kind: http-request
+name: Accept Supported Postcode 4101
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+      "orderIds": ["6aced7a16670684bfa4cce58"],
+      "deliveryMethod": "standard",
+      "streetAddress": "12 Main Street",
+      "suburb": "Brisbane",
+      "postcode": "4101"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test('Supported postcode is accepted', () => {
+        pm.response.to.have.status(200);
+      });
+
+      const orders = pm.response.json();
+
+      pm.test('Order contains the supported postcode', () => {
+        pm.expect(orders[0].postcode).to.eql('4101');
+      });
+    language: text/javascript
+order: 1895527968669498

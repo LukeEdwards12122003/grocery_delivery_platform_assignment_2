@@ -1,0 +1,31 @@
+$kind: http-request
+name: Accept Maximum Valid Quantity
+description: ""
+url: "{{base_url}}/api/orders"
+method: POST
+headers:
+  Authorization: Bearer {{customer_token}}
+body:
+  type: json
+  content: |+
+    {
+        "item": "Milk",
+        "quantity": 10
+    }
+
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Maximum valid quantity is accepted", function () {
+          pm.response.to.have.status(201);
+      });
+
+      pm.test("Order quantity is 10", function () {
+          const order = pm.response.json();
+          pm.expect(order.quantity).to.equal(10);
+      });
+    language: text/javascript
+order: 282987503088017

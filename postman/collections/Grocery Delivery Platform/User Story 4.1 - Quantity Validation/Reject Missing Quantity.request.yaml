@@ -1,0 +1,30 @@
+$kind: http-request
+name: Reject Missing Quantity
+description: ""
+url: "{{base_url}}/api/orders"
+method: POST
+headers:
+  Authorization: Bearer {{customer_token}}
+body:
+  type: json
+  content: |+
+    {
+        "item": "Milk"
+    }
+
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Missing quantity is rejected", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Correct quantity error is returned", function () {
+          pm.expect(pm.response.json().message)
+              .to.equal("Quantity must be greater than zero");
+      });
+    language: text/javascript
+order: 4302713754548236

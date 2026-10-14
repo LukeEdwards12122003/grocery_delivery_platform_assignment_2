@@ -1,5 +1,5 @@
 $kind: http-request
-name: Reject Zero Quantity
+name: Reject Negative Quantity
 url: "{{base_url}}/api/orders"
 method: POST
 headers:
@@ -9,21 +9,20 @@ body:
   content: |-
     {
       "item": "Milk",
-      "quantity": 0,
-      "deliveryAddress": "123 Test Street"
+      "quantity": -1
     }
 auth:
   type: noauth
 scripts:
   - type: afterResponse
     code: |-
-      pm.test("Zero quantity is rejected", function () {
+      pm.test("Negative quantity is rejected", function () {
           pm.response.to.have.status(400);
       });
 
-      pm.test("Correct validation message is returned", function () {
+      pm.test("Correct error message is returned", function () {
           pm.expect(pm.response.json().message)
-              .to.equal("Please provide valid order details");
+              .to.equal("Quantity must be greater than zero");
       });
     language: text/javascript
-order: 3812595827574566
+order: 3819284803384188

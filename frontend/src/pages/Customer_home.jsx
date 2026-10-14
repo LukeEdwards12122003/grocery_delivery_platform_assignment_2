@@ -1,15 +1,17 @@
+
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 
 const CustomerHome = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     item: '',
     quantity: 1,
-    deliveryAddress: '',
-  });
+  })
 
   const [orders, setOrders] = useState([]);
 
@@ -30,23 +32,46 @@ const CustomerHome = () => {
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
+
+    const orderData = {
+      item: formData.item,
+      quantity: Number(formData.quantity),
+    }
 
     try {
-      await axiosInstance.post('/api/orders', formData, {
+      await axiosInstance.post('/api/orders', orderData, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      alert('Order placed successfully.');
+      alert(
+        'Item added to checkout. Choose delivery options to place your order.',
+      )
 
       setFormData({
         item: '',
         quantity: 1,
-        deliveryAddress: '',
-      });
+      })
 
       fetchOrders();
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to place order. Please try again.');
+      alert(error.response?.data?.message || 'Failed to add item. Please try again.');
+    }
+  };
+
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm('Are you sure you want to cancel this order?')) {
+      return;
+    }
+
+    try {
+      await axiosInstance.patch(`/api/orders/${orderId}/cancel`, {}, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      alert('Order cancelled successfully.');
+      await fetchOrders();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to cancel order. Please try again.');
+      await fetchOrders();
     }
   };
 
@@ -57,7 +82,7 @@ const CustomerHome = () => {
         <p className="mb-6">Welcome, {user.name}.</p>
 
         <form onSubmit={handleSubmit}>
-          <h2 className="text-xl font-bold mb-4">Place Grocery Order</h2>
+          <h2 className="text-xl font-bold mb-4">Add Grocery Item</h2>
 
           <select
             value={formData.item}
@@ -78,16 +103,9 @@ const CustomerHome = () => {
             placeholder="Quantity"
             min="1"
             value={formData.quantity}
-            onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-            className="w-full mb-4 p-2 border rounded"
-            required
-          />
-
-          <input
-            type="text"
-            placeholder="Delivery Address"
-            value={formData.deliveryAddress}
-            onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, quantity: e.target.value })
+            }
             className="w-full mb-4 p-2 border rounded"
             required
           />
@@ -96,7 +114,7 @@ const CustomerHome = () => {
             type="submit"
             className="w-full bg-green-600 text-white p-2 rounded"
           >
-            Place Order
+            Add Grocery Item
           </button>
         </form>
 
@@ -107,18 +125,44 @@ const CustomerHome = () => {
             <p>You have no orders.</p>
           ) : (
             orders.map((order) => (
-              <div
-                key={order._id}
-                className="border p-4 mb-4 rounded"
-              >
-                <p><strong>Item:</strong> {order.item}</p>
-                <p><strong>Quantity:</strong> {order.quantity}</p>
-                <p><strong>Delivery Address:</strong> {order.deliveryAddress}</p>
-                <p><strong>Status:</strong> {order.status}</p>
+              <div key={order._id} className="border p-4 mb-4 rounded">
+                <p>
+                  <strong>Item:</strong> {order.item}
+                </p>
+                <p>
+                  <strong>Quantity:</strong> {order.quantity}
+                </p>
+                {order.status !== 'Draft' && (
+                  <p>
+                    <strong>Delivery Address:</strong>{' '}
+                    {order.streetAddress && order.suburb && order.postcode
+                      ? `${order.streetAddress}, ${order.suburb}, ${order.postcode}`
+                      : order.deliveryAddress}
+                  </p>
+                )}
+                <p>
+                  <strong>Status:</strong> {order.status}
+                </p>
+                {order.status === 'Pending' && (
+                  <button
+                    type="button"
+                    onClick={() => handleCancelOrder(order._id)}
+                    className="mt-3 bg-red-600 text-white px-4 py-2 rounded"
+                  >
+                    Cancel Order
+                  </button>
+                )}
               </div>
             ))
           )}
         </div>
+        <button
+          type="button"
+          onClick={() => navigate('/delivery-options')}
+          className="w-full bg-green-600 text-white p-2 rounded"
+        >
+          Proceed to Delivery Options
+        </button>
       </div>
     </div>
   );
