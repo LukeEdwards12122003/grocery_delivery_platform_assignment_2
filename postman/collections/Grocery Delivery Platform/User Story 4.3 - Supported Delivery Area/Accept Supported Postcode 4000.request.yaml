@@ -1,13 +1,14 @@
 $kind: http-request
-url: "{{base_url}}/api/orders"
-method: POST
+name: Accept Supported Postcode 4000
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
 body:
   type: json
   content: |-
     {
-      "item": "Milk",
-      "quantity": 2,
-      "streetAddress": "123 Test Street",
+      "orderIds": ["6acec2b1dbd81f83ef0f671c"],
+      "deliveryMethod": "standard",
+      "streetAddress": "12 Main Street",
       "suburb": "Brisbane City",
       "postcode": "4000"
     }
@@ -21,12 +22,14 @@ scripts:
     language: text/javascript
   - type: afterResponse
     code: |-
-      pm.test("Supported postcode is accepted", function () {
-        pm.response.to.have.status(201);
+      pm.test('Supported postcode is accepted', () => {
+        pm.response.to.have.status(200);
       });
 
-      pm.test("Order contains the supported postcode", function () {
-        pm.expect(pm.response.json().postcode).to.eql("4000");
+      const orders = pm.response.json();
+
+      pm.test('Order contains the supported postcode', () => {
+        pm.expect(orders[0].postcode).to.eql('4000');
       });
     language: text/javascript
 order: 1791797237236
