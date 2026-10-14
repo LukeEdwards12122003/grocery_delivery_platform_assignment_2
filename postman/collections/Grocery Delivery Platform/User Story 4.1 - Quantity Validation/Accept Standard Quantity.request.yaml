@@ -10,8 +10,7 @@ body:
   content: |+
     {
         "item": "Milk",
-        "quantity": 2,
-        "deliveryAddress": "123 Test Street"
+        "quantity": 2
     }
 
 scripts:
