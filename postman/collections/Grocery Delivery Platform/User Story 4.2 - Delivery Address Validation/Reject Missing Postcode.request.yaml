@@ -1,15 +1,16 @@
 $kind: http-request
 name: Reject Missing Postcode
-url: "{{base_url}}/api/orders"
-method: POST
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
 body:
   type: json
   content: |-
     {
-      "item": "Milk",
-      "quantity": 2,
-      "streetAddress": "123 Test Street",
-      "suburb": "Brisbane City"
+      "orderIds": ["6acec2b1dbd81f83ef0f671c"],
+      "deliveryMethod": "standard",
+      "streetAddress": "12 Main Street",
+      "suburb": "Brisbane",
+      "postcode": ""
     }
 auth:
   type: bearer
@@ -21,13 +22,15 @@ scripts:
     language: text/javascript
   - type: afterResponse
     code: |-
-      pm.test("Missing postcode is rejected", function () {
+      pm.test('Missing postcode returns 400', () => {
         pm.response.to.have.status(400);
       });
 
-      pm.test("Correct error message is returned", function () {
-        pm.expect(pm.response.json().message)
-          .to.equal("Street address, suburb and postcode are required");
+      pm.test('API returns the required-address message', () => {
+        const response = pm.response.json();
+        pm.expect(response.message).to.eql(
+          'Street address, suburb and postcode are required'
+        );
       });
     language: text/javascript
 order: 4172418957019773

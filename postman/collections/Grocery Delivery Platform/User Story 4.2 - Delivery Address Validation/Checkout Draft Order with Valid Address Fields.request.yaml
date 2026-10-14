@@ -1,12 +1,12 @@
 $kind: http-request
-name: Checkout Draft Order with Separate Address Fields
+name: Checkout Draft Order with Valid Address Fields
 url: "{{base_url}}/api/orders/delivery-method"
 method: PATCH
 body:
   type: json
   content: |-
     {
-      "orderIds": ["6acec2a2dbd81f83ef0f6719"],
+      "orderIds": ["6acece3bdbd81f83ef0f676f"],
       "deliveryMethod": "standard",
       "streetAddress": "12 Main Street",
       "suburb": "Brisbane",
@@ -32,4 +32,4 @@ scripts:
         pm.expect(orders[0].status).to.eql('Pending');
       });
     language: text/javascript
-order: 4399755541372668
+order: 666357185575

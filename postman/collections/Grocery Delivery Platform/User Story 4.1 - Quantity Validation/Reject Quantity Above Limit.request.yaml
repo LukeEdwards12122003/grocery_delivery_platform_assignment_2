@@ -10,8 +10,7 @@ body:
   content: |+
     {
         "item": "InvalidQuantityTestItem",
-        "quantity": 11,
-        "deliveryAddress": "123 Test Street"
+        "quantity": 11
     }
 
 scripts:

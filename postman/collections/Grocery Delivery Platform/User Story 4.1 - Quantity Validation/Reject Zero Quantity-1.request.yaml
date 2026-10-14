@@ -9,8 +9,7 @@ body:
   content: |-
     {
       "item": "Milk",
-      "quantity": 0,
-      "deliveryAddress": "123 Test Street"
+      "quantity": 0
     }
 auth:
   type: noauth

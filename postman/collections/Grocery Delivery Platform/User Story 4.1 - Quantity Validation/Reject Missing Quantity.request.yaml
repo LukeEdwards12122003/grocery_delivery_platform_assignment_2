@@ -9,8 +9,7 @@ body:
   type: json
   content: |+
     {
-        "item": "Milk",
-        "deliveryAddress": "123 Test Street"
+        "item": "Milk"
     }
 
 scripts:

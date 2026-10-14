@@ -1,14 +1,14 @@
 $kind: http-request
-url: "{{base_url}}/api/orders"
-method: POST
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
 body:
   type: json
   content: |-
     {
-      "item": "Milk",
-      "quantity": 2,
-      "streetAddress": "123 Test Street",
-      "suburb": "Brisbane City",
+      "orderIds": ["6acec2b1dbd81f83ef0f671c"],
+      "deliveryMethod": "standard",
+      "streetAddress": "12 Main Street",
+      "suburb": "Brisbane",
       "postcode": "40000"
     }
 auth:
