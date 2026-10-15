@@ -2,11 +2,13 @@
 const Order = require('../models/Orders');
 const orderEvents = require('../observers/orderEvents');
 const createOrderValidationChain = require('../validation/orderValidationChain')
+const { getOrderState } = require('../states/orderStates');
 
 const getOrders = async (req, res) => {
     try {
         let orders;
 
+      
         if (req.user.role === 'staff') {
         orders = await Order.find({ status: { $ne: 'Draft' } }).populate(
           'customerId',
@@ -68,7 +70,7 @@ const editPendingOrder = async (req, res) => {
         if (req.user.role !== 'customer') {
             return res.status(403).json({ message: 'Only customers can edit orders' });
         }
-        // Only allow editing of the logged-in customer's Pending order.
+
         const { item, quantity } = req.body;
         const allowedItems = ['Milk', 'Bread', 'Eggs', 'Apples', 'Rice'];
         if (typeof item !== 'string' || !allowedItems.includes(item)) {
@@ -84,13 +86,16 @@ const editPendingOrder = async (req, res) => {
             { $set: { item, quantity } },
             { new: true, runValidators: true }
         );
-        // If the order was not found or is not pending, check if it exists and belongs to the user, then return an appropriate message.
+
         if (!updatedOrder) {
             const order = await Order.findById(req.params.id);
             if (!order || String(order.customerId) !== String(req.user.id)) {
                 return res.status(404).json({ message: 'Order not found' });
             }
-            return res.status(400).json({ message: 'Only pending orders can be edited' });
+            if (!getOrderState(order.status).canEdit()) {
+                return res.status(400).json({ message: 'Only pending orders can be edited' });
+            }
+            return res.status(409).json({ message: 'Order status changed. Please retry.' });
         }
 
         return res.json({ message: 'Order updated successfully', order: updatedOrder });
@@ -108,8 +113,7 @@ const cancelOrder = async (req, res) => {
             return res.status(403).json({ message: 'Only customers can cancel orders' });
         }
 
-        // Update only the logged-in customer's Pending order.
-        // The status condition prevents two simultaneous requests from cancelling it twice.
+
         const cancelledOrder = await Order.findOneAndUpdate(
             { _id: req.params.id, customerId: req.user.id, status: 'Pending' },
             { $set: { status: 'Cancelled' } },
@@ -121,7 +125,10 @@ const cancelOrder = async (req, res) => {
             if (!order || String(order.customerId) !== String(req.user.id)) {
                 return res.status(404).json({ message: 'Order not found' });
             }
-            return res.status(400).json({ message: 'Only pending orders can be cancelled' });
+            if (!getOrderState(order.status).canCancel()) {
+                return res.status(400).json({ message: 'Only pending orders can be cancelled' });
+            }
+            return res.status(409).json({ message: 'Order status changed. Please retry.' });
         }
 
         try {
@@ -159,31 +166,30 @@ const updateOrderStatus = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-      // Draft orders have not completed checkout and validation, so staff cannot process them.
-      if (order.status === 'Cancelled') {
-        return res.status(400).json({ message: 'Cancelled orders cannot be processed' });
+      if (!getOrderState(order.status).canTransitionTo(status) || order.status === 'Draft') {
+        return res.status(400).json({ message: 'Invalid order status transition' });
       }
 
-      if (order.status === 'Draft') {
-        return res.status(400).json({
-          message: 'Complete checkout before processing this order',
-        })
+  
+      const updatedOrder = await Order.findOneAndUpdate(
+        { _id: req.params.id, status: order.status },
+        { $set: { status } },
+        { new: true, runValidators: true }
+      );
+      if (!updatedOrder) {
+        return res.status(409).json({ message: 'Order status changed. Please refresh and try again.' });
       }
 
-      const previousStatus = order.status
-
-        order.status = status;
-        const updatedOrder = await order.save();
-
-        if (previousStatus !== updatedOrder.status) {
-            await orderEvents.notify({
-                type: 'ORDER_STATUS_CHANGED',
-                orderId: updatedOrder._id,
-                customerId: updatedOrder.customerId,
-                status: updatedOrder.status
-            });
-        }
-
+      try {
+        await orderEvents.notify({
+          type: 'ORDER_STATUS_CHANGED',
+          orderId: updatedOrder._id,
+          customerId: updatedOrder.customerId,
+          status: updatedOrder.status
+        });
+      } catch (notificationError) {
+        console.error('Failed to send status notification:', notificationError);
+      }
 
         res.json(updatedOrder);
     } catch (error) {
@@ -261,8 +267,7 @@ const updateDeliveryMethod = async (req, res) => {
         }),
       )
 
-      // Send a notification for new orders after checkout.
-      // JERRY created this notification code block. I commented out his original one. I moved here since I needed to change address and delivery option valification for my design feature.
+      
       await Promise.all(
         updates
           .filter(({ isDraft }) => isDraft)
