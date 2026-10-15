@@ -14,6 +14,8 @@ const CustomerHome = () => {
   })
 
   const [orders, setOrders] = useState([]);
+  const [editingOrderId, setEditingOrderId] = useState(null);
+  const [editFormData, setEditFormData] = useState({ item: '', quantity: 1 });
 
   const fetchOrders = async () => {
     try {
@@ -71,6 +73,34 @@ const CustomerHome = () => {
       await fetchOrders();
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to cancel order. Please try again.');
+      await fetchOrders();
+    }
+  };
+
+  const handleEditOrder = (order) => {
+    setEditingOrderId(order._id);
+    setEditFormData({ item: order.item, quantity: order.quantity });
+  };
+
+  const handleSaveEdit = async (orderId) => {
+    const quantity = Number(editFormData.quantity);
+    if (!editFormData.item || !Number.isInteger(quantity) || quantity < 1 || quantity > 10) {
+      alert('Please select an item and enter a whole-number quantity between 1 and 10.');
+      return;
+    }
+
+    try {
+      await axiosInstance.patch(`/api/orders/${orderId}/edit`, {
+        item: editFormData.item,
+        quantity,
+      }, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      setEditingOrderId(null);
+      alert('Order updated successfully.');
+      await fetchOrders();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to update order. Please try again.');
       await fetchOrders();
     }
   };
@@ -143,6 +173,54 @@ const CustomerHome = () => {
                 <p>
                   <strong>Status:</strong> {order.status}
                 </p>
+                {order.status === 'Pending' && editingOrderId === order._id && (
+                  <div className="mt-3 border p-3 rounded">
+                    <h3 className="font-bold mb-2">Edit Pending Order</h3>
+                    <select
+                      value={editFormData.item}
+                      onChange={(e) => setEditFormData({ ...editFormData, item: e.target.value })}
+                      className="w-full mb-3 p-2 border rounded"
+                    >
+                      <option value="Milk">Milk</option>
+                      <option value="Bread">Bread</option>
+                      <option value="Eggs">Eggs</option>
+                      <option value="Apples">Apples</option>
+                      <option value="Rice">Rice</option>
+                    </select>
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      step="1"
+                      value={editFormData.quantity}
+                      onChange={(e) => setEditFormData({ ...editFormData, quantity: e.target.value })}
+                      className="w-full mb-3 p-2 border rounded"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleSaveEdit(order._id)}
+                      className="bg-green-600 text-white px-4 py-2 rounded mr-2"
+                    >
+                      Save Changes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingOrderId(null)}
+                      className="bg-gray-500 text-white px-4 py-2 rounded"
+                    >
+                      Discard Changes
+                    </button>
+                  </div>
+                )}
+                {order.status === 'Pending' && editingOrderId !== order._id && (
+                  <button
+                    type="button"
+                    onClick={() => handleEditOrder(order)}
+                    className="mt-3 bg-blue-600 text-white px-4 py-2 rounded mr-2"
+                  >
+                    Edit Order
+                  </button>
+                )}
                 {order.status === 'Pending' && (
                   <button
                     type="button"
