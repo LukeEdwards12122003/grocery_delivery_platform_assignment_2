@@ -60,8 +60,11 @@ const StaffHome = () => {
                 <p><strong>Item:</strong> {order.item}</p>
                 <p><strong>Quantity:</strong> {order.quantity}</p>
                 <p><strong>Delivery Address:</strong> {order.deliveryAddress}</p>
-                <p><strong>Status:</strong></p>
+                <label htmlFor={`status-${order._id}`}>
+                  <strong>Status:</strong>
+                </label>
                 <select
+                  id={`status-${order._id}`}
                   value={order.status}
                   onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
                   className="mt-2 p-2 border rounded"

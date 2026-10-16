@@ -113,8 +113,11 @@ const CustomerHome = () => {
 
         <form onSubmit={handleSubmit}>
           <h2 className="text-xl font-bold mb-4">Add Grocery Item</h2>
-
+          <label htmlFor="GroceryItem">
+            Grocery Item
+          </label>
           <select
+            id="GroceryItem"
             value={formData.item}
             onChange={(e) => setFormData({ ...formData, item: e.target.value })}
             className="w-full mb-4 p-2 border rounded"
@@ -128,7 +131,11 @@ const CustomerHome = () => {
             <option value="Rice">Rice</option>
           </select>
 
+          <label htmlFor="Quantity">
+            Quantity
+          </label>
           <input
+            id="Quantity"
             type="number"
             placeholder="Quantity"
             min="1"
@@ -176,7 +183,11 @@ const CustomerHome = () => {
                 {order.status === 'Pending' && editingOrderId === order._id && (
                   <div className="mt-3 border p-3 rounded">
                     <h3 className="font-bold mb-2">Edit Pending Order</h3>
+                    <label htmlFor={`editItem-${order._id}`}>
+                      Grocery Item
+                    </label>  
                     <select
+                      id={`editItem-${order._id}`}
                       value={editFormData.item}
                       onChange={(e) => setEditFormData({ ...editFormData, item: e.target.value })}
                       className="w-full mb-3 p-2 border rounded"
@@ -187,7 +198,11 @@ const CustomerHome = () => {
                       <option value="Apples">Apples</option>
                       <option value="Rice">Rice</option>
                     </select>
+                    <label htmlFor={`editQuantity-${order._id}`}>
+                      Quantity
+                    </label>
                     <input
+                      id={`editQuantity-${order._id}`}
                       type="number"
                       min="1"
                       max="10"

@@ -11,19 +11,19 @@ function DeliveryOptions() {
     const [orders, setOrders] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState([]);
     const [address, setAddress] = useState({
-    streetAddress: '',
-    suburb: '',
-    postcode: '',
-  });
+        streetAddress: '',
+        suburb: '',
+        postcode: '',
+    });
 
     const fetchOrders = async () => {
         try {
             const response = await axiosInstance.get('/api/orders', {
-            headers: { Authorization: `Bearer ${user.token}` },
+                headers: { Authorization: `Bearer ${user.token}` },
             });
 
-        setOrders(response.data);
-        } 
+            setOrders(response.data);
+        }
         catch (error) {
             alert('Failed to load orders. Please try again.');
         }
@@ -56,17 +56,17 @@ function DeliveryOptions() {
         }
 
         const cleanedAddress = {
-          streetAddress: address.streetAddress.trim(),
-          suburb: address.suburb.trim(),
-          postcode: address.postcode.trim(),
+            streetAddress: address.streetAddress.trim(),
+            suburb: address.suburb.trim(),
+            postcode: address.postcode.trim(),
         }
         if (
-          !cleanedAddress.streetAddress ||
-          !cleanedAddress.suburb ||
-          !/^\d{4}$/.test(cleanedAddress.postcode)
+            !cleanedAddress.streetAddress ||
+            !cleanedAddress.suburb ||
+            !/^\d{4}$/.test(cleanedAddress.postcode)
         ) {
-          alert('Enter a street address, suburb, and four-digit postcode.')
-          return
+            alert('Enter a street address, suburb, and four-digit postcode.')
+            return
         }
 
         try {
@@ -74,16 +74,16 @@ function DeliveryOptions() {
                 orderIds: selectedOrders,
                 deliveryMethod: deliveryMethod,
                 ...cleanedAddress,
-              },
-              {
-                headers: { Authorization: `Bearer ${user.token}` },
-              },
+            },
+                {
+                    headers: { Authorization: `Bearer ${user.token}` },
+                },
             )
             alert('Order placed successfully.');
             navigate('/check-delivery', { state: { selectedOrders, deliveryMethod } });
         } catch (error) {
             alert(
-              error.response?.data?.message ||
+                error.response?.data?.message ||
                 'Failed to place the order. Please try again.',
             )
         }
@@ -110,31 +110,38 @@ function DeliveryOptions() {
                             key={order._id}
                             onClick={() =>
                                 setSelectedOrders(prev =>
-                                prev.includes(order._id)
-                                    ? prev.filter(id => id !== order._id)
-                                    : [...prev, order._id]
+                                    prev.includes(order._id)
+                                        ? prev.filter(id => id !== order._id)
+                                        : [...prev, order._id]
                                 )
                             }
-                            className={`border-2 rounded-lg p-4 cursor-pointer ${
-                            selectedOrders.includes(order._id)
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200'
-                            }`}
+                            className={`border-2 rounded-lg p-4 cursor-pointer ${selectedOrders.includes(order._id)
+                                    ? 'border-blue-500 bg-blue-50'
+                                    : 'border-gray-200'
+                                }`}
                         >
                             <div className="flex items-center gap-3">
                                 <input
                                     type="checkbox"
+                                    id={`order-${order._id}`}
                                     name="delivery"
                                     value={order._id}
                                     checked={selectedOrders.includes(order._id)}
-                    onClick={(e) => e.stopPropagation()}
-                                    onChange={() => 
-                                        setSelectedOrders(prev => 
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={() =>
+                                        setSelectedOrders(prev =>
                                             prev.includes(order._id)
                                                 ? prev.filter(id => id !== order._id)
                                                 : [...prev, order._id]
                                         )}
                                 />
+                                <label
+                                    htmlFor={`order-${order._id}`}
+                                    className="sr-only"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    Select {order.item}, Quantity: {order.quantity}
+                                </label>
                                 <div className="flex-1">
                                     <p>
                                         <strong>Item:</strong> {order.item}
@@ -150,7 +157,7 @@ function DeliveryOptions() {
                                             <strong>Delivery Address:</strong>{' '}
                                             {order.streetAddress && order.suburb && order.postcode
                                                 ? `${order.streetAddress}, ${order.suburb}, ${order.postcode}`
-                                                : order.deliveryAddress }
+                                                : order.deliveryAddress}
                                         </p>
                                     )}
                                 </div>
@@ -159,97 +166,110 @@ function DeliveryOptions() {
                     ))}
                 </div>
 
-            <div className="mt-6 mb-6 border-t"></div>
+                <div className="mt-6 mb-6 border-t"></div>
 
 
                 <div className="space-y-3">
                     {deliveryOptions.map(option => (
-                    <div
-                        key={option.id}
-                        onClick={() => setDeliveryMethod(option.id)}
-                        className={`border-2 rounded-lg p-4 cursor-pointer ${
-                        deliveryMethod === option.id
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200'
-                        }`}
-                    >
-                        <div className="flex items-center gap-3">
-                        <input
-                            type="radio"
-                            name="delivery"
-                            value={option.id}
-                            checked={deliveryMethod === option.id}
-                            onChange={() => setDeliveryMethod(option.id)}
-                            onClick={(e) => e.stopPropagation()}
-                        />
-                        <div className="flex-1">
-                            <h2 className="font-semibold">
-                                {option.name}
-                            </h2>
-                            <p className="text-sm text-gray-500">
-                                {option.description}
-                            </p>
+                        <div
+                            key={option.id}
+                            onClick={() => setDeliveryMethod(option.id)}
+                            className={`border-2 rounded-lg p-4 cursor-pointer ${deliveryMethod === option.id
+                                    ? 'border-blue-500 bg-blue-50'
+                                    : 'border-gray-200'
+                                }`}
+                        >
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="radio"
+                                    id={`delivery-${option.id}`}
+                                    name="delivery"
+                                    value={option.id}
+                                    checked={deliveryMethod === option.id}
+                                    onChange={() => setDeliveryMethod(option.id)}
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                                <div className="flex-1">
+                                    <label
+                                        htmlFor={`delivery-${option.id}`}
+                                        className="font-semibold cursor-pointer"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        {option.name}
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    </div>
                     ))}
                 </div>
 
-          {deliveryMethod && (
-            <section className="mt-6">
-              <h2 className="text-lg font-bold mb-4">Delivery Address</h2>
+                {deliveryMethod && (
+                    <section className="mt-6">
+                        <h2 className="text-lg font-bold mb-4">Delivery Address</h2>
+                        <label htmlFor="streetAddress">
+                            Street Address
+                        </label>
 
-              <input
-                type="text"
-                placeholder="Street Address"
-                value={address.streetAddress}
-                onChange={(e) =>
-                  setAddress({ ...address, streetAddress: e.target.value })
-                }
-                className="w-full mb-4 p-2 border rounded"
-              />
+                        <input
+                            type="text"
+                            id="streetAddress"
+                            placeholder="Street Address"
+                            value={address.streetAddress}
+                            onChange={(e) =>
+                                setAddress({ ...address, streetAddress: e.target.value })
+                            }
+                            className="w-full mb-4 p-2 border rounded"
+                        />
 
-              <input
-                type="text"
-                placeholder="Suburb"
-                value={address.suburb}
-                onChange={(e) =>
-                  setAddress({ ...address, suburb: e.target.value })
-                }
-                className="w-full mb-4 p-2 border rounded"
-              />
+                        <label htmlFor="suburb">
+                            Suburb
+                        </label>
+                        <input
+                            type="text"
+                            id="suburb"
+                            placeholder="Suburb"
+                            value={address.suburb}
+                            onChange={(e) =>
+                                setAddress({ ...address, suburb: e.target.value })
+                            }
+                            className="w-full mb-4 p-2 border rounded"
+                        />
 
-              <input
-                type="text"
-                placeholder="Postcode"
-                inputMode="numeric"
-                maxLength={4}
-                value={address.postcode}
-                onChange={(e) =>
-                  setAddress({ ...address, postcode: e.target.value })
-                }
-                className="w-full mb-4 p-2 border rounded"
-              />
-            </section>
-          )}
+                        <label htmlFor="postcode">
+                            Postcode
+                        </label>
+                        <input
+                            type="text"
+                            id="postcode"
+                            placeholder="Postcode"
+                            inputMode="numeric"
+                            maxLength={4}
+                            value={address.postcode}
+                            onChange={(e) =>
+                                setAddress({ ...address, postcode: e.target.value })
+                            }
+                            className="w-full mb-4 p-2 border rounded"
+                        />
+                    </section>
+                )}
 
-            <div className="mt-6 mb-6 border-t"></div>
+                <div className="mt-6 mb-6 border-t"></div>
 
                 <div className="flex gap-3">
                     <button
-                    type="button"
-                    onClick={handleBack}
-                    className="w-1/3 border border-gray-600 p-2 rounded"
+                        type="button"
+                        onClick={handleBack}
+                        className="w-1/3 border border-gray-600 p-2 rounded"
                     >
-                    Back
+                        Back
                     </button>
 
                     <button
-                    type="button"
-                    onClick={handleConfirmDelivery}
-                    className="w-2/3 bg-green-600 text-white p-2 rounded"
+                        type="button"
+                        onClick={handleConfirmDelivery}
+                        className="w-2/3 bg-green-600 text-white p-2 rounded"
                     >
-                    Confirm Delivery
+                        Confirm Delivery
                     </button>
                 </div>
             </div>
