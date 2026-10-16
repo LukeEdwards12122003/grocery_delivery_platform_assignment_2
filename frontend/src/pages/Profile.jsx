@@ -6,182 +6,202 @@ import axiosInstance from '../axiosConfig';
 
 const Profile = () => {
 
-const { user } = useAuth(); // Access user token from context
+    const { user } = useAuth(); // Access user token from context
 
-const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState({
 
-name: '',
+        name: '',
 
-email: '',
+        email: '',
 
-university: '',
+        university: '',
 
-address: '',
+        address: '',
 
-});
+    });
 
-const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-useEffect(() => {
+    useEffect(() => {
 
-// Fetch profile data from the backend
-const fetchProfile = async () => {
+        // Fetch profile data from the backend
+        const fetchProfile = async () => {
 
-setLoading(true);
+            setLoading(true);
 
-try {
+            try {
 
-const response = await axiosInstance.get('/api/auth/profile', {
+                const response = await axiosInstance.get('/api/auth/profile', {
 
-headers: { Authorization: `Bearer ${user.token}` },
+                    headers: { Authorization: `Bearer ${user.token}` },
 
-});
+                });
 
-setFormData({
+                setFormData({
 
-name: response.data.name,
+                    name: response.data.name,
 
-email: response.data.email,
+                    email: response.data.email,
 
-university: response.data.university || '',
+                    university: response.data.university || '',
 
-address: response.data.address || '',
+                    address: response.data.address || '',
 
-});
+                });
 
-} catch (error) {
+            } catch (error) {
 
-alert('Failed to fetch profile. Please try again.');
+                alert('Failed to fetch profile. Please try again.');
 
-} finally {
+            } finally {
 
-setLoading(false);
+                setLoading(false);
 
-}
+            }
 
-};
+        };
 
-if (user) fetchProfile();
+        if (user) fetchProfile();
 
-}, [user]);
-const handleSubmit = async (e) => {
+    }, [user]);
+    const handleSubmit = async (e) => {
 
-e.preventDefault();
+        e.preventDefault();
 
-setLoading(true);
+        setLoading(true);
 
-try {
+        try {
 
-await axiosInstance.put('/api/auth/profile', formData, {
+            await axiosInstance.put('/api/auth/profile', formData, {
 
-headers: { Authorization: `Bearer ${user.token}` },
+                headers: { Authorization: `Bearer ${user.token}` },
 
-});
+            });
 
-alert('Profile updated successfully!');
+            alert('Profile updated successfully!');
 
-} catch (error) {
+        } catch (error) {
 
-alert('Failed to update profile. Please try again.');
+            alert('Failed to update profile. Please try again.');
 
-} finally {
+        } finally {
 
-setLoading(false);
+            setLoading(false);
 
-}
+        }
 
-};
+    };
 
-if (loading) {
+    if (loading) {
 
-return <div className="text-center mt-20">Loading...</div>;
+        return <div className="text-center mt-20">Loading...</div>;
 
-}
+    }
 
-return (
+    return (
 
-<div className="max-w-md mx-auto mt-20">
-<form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
+        <div className="max-w-md mx-auto mt-20">
+            <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
 
-<h1 className="text-2xl font-bold mb-4 text-center">Your Profile</h1>
+                <h1 className="text-2xl font-bold mb-4 text-center">Your Profile</h1>
 
-<input
+                <label htmlFor="name">
+                    Name
+                </label>
+                <input
+                    id="name"       
 
-type="text"
+                    type="text"
 
-placeholder="Name"
+                    placeholder="Name"
 
-value={formData.name}
+                    value={formData.name}
 
-onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
 
-className="w-full mb-4 p-2 border rounded"
+                    className="w-full mb-4 p-2 border rounded"
 
-/>
+                />
 
-<input
+                <label htmlFor="email">
+                    Email
+                </label>
+                <input
+                    id="email"
 
-type="email"
+                    type="email"
 
-placeholder="Email"
+                    placeholder="Email"
 
-value={formData.email}
+                    value={formData.email}
 
-onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
 
-className="w-full mb-4 p-2 border rounded"
-/>
+                    className="w-full mb-4 p-2 border rounded"
+                />
 
-<input
+                <label htmlFor="role">
+                    Role
+                </label>
+                <input
+                    id="role"
 
-type="text"
+                    type="text"
 
-value={`Role: ${user.role === 'staff' ? 'Store Staff' : 'Customer'}`}
+                    value={`Role: ${user.role === 'staff' ? 'Store Staff' : 'Customer'}`}
 
-className="w-full mb-4 p-2 border rounded bg-gray-100"
+                    className="w-full mb-4 p-2 border rounded bg-gray-100"
 
-disabled
+                    disabled
 
-/>
+                />
 
-<input
+                <label htmlFor="university">
+                    University
+                </label>
+                <input
+                    id="university" 
 
-type="text"
+                    type="text"
 
-placeholder="University"
+                    placeholder="University"
 
-value={formData.university}
+                    value={formData.university}
 
-onChange={(e) => setFormData({ ...formData, university: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, university: e.target.value })}
 
-className="w-full mb-4 p-2 border rounded"
+                    className="w-full mb-4 p-2 border rounded"
 
-/>
+                />
 
-<input
+                <label htmlFor="address">
+                    Address
+                </label>
+                <input
+                    id="address"
 
-type="text"
+                    type="text"
 
-placeholder="Address"
+                    placeholder="Address"
 
-value={formData.address}
+                    value={formData.address}
 
-onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
 
-className="w-full mb-4 p-2 border rounded"
+                    className="w-full mb-4 p-2 border rounded"
 
-/>
+                />
 
-<button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
-{loading ? 'Updating...' : 'Update Profile'}
+                <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
+                    {loading ? 'Updating...' : 'Update Profile'}
 
-</button>
+                </button>
 
-</form>
+            </form>
 
-</div>
+        </div>
 
-);
+    );
 
 };
 

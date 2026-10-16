@@ -4,107 +4,123 @@ import axiosInstance from '../axiosConfig';
 
 const Register = () => {
 
-const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'customer' });
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'customer' });
 
-const navigate = useNavigate();
+    const navigate = useNavigate();
 
-const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
 
-e.preventDefault();
+        e.preventDefault();
 
-try {
+        try {
 
-await axiosInstance.post('/api/auth/register', formData);
+            await axiosInstance.post('/api/auth/register', formData);
 
-alert('Registration successful. Please log in.');
+            alert('Registration successful. Please log in.');
 
-navigate('/login');
+            navigate('/login');
 
-} catch (error) {
+        } catch (error) {
 
-alert('Registration failed. Please try again.');
+            alert('Registration failed. Please try again.');
 
-}
+        }
 
-};
+    };
 
-return (
+    return (
 
-<div className="max-w-md mx-auto mt-20">
+        <div className="max-w-md mx-auto mt-20">
 
-<form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
+            <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
 
-<h1 className="text-2xl font-bold mb-4 text-center">Register</h1>
+                <h1 className="text-2xl font-bold mb-4 text-center">Register</h1>
+                <label htmlFor="name">
+                    Name
+                </label>
 
-<input
+                <input
+                    id="name"
 
-type="text"
+                    type="text"
 
-placeholder="Name"
+                    placeholder="Name"
 
-value={formData.name}
+                    value={formData.name}
 
-onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
 
-className="w-full mb-4 p-2 border rounded"
+                    className="w-full mb-4 p-2 border rounded"
 
-/>
+                />
 
-<input
+                <label htmlFor="email">
+                    Email
+                </label>
+                <input
+                    id="email"
 
-type="email"
+                    type="email"
 
-placeholder="Email"
+                    placeholder="Email"
 
-value={formData.email}
+                    value={formData.email}
 
-onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
 
-className="w-full mb-4 p-2 border rounded"
+                    className="w-full mb-4 p-2 border rounded"
 
-/>
+                />
 
-<input
+                <label htmlFor="password">
+                    Password
+                </label>
+                <input
+                    id="password"
 
-type="password"
+                    type="password"
 
-placeholder="Password"
+                    placeholder="Password"
 
-value={formData.password}
+                    value={formData.password}
 
-onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
 
-className="w-full mb-4 p-2 border rounded"
+                    className="w-full mb-4 p-2 border rounded"
 
-/>
+                />
 
-<select
+                <label htmlFor="role">
+                    Role
+                </label>
+                <select
+                    id="role"
 
-value={formData.role}
+                    value={formData.role}
 
-onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
 
-className="w-full mb-4 p-2 border rounded"
+                    className="w-full mb-4 p-2 border rounded"
 
->
+                >
 
-<option value="customer">Customer</option>
+                    <option value="customer">Customer</option>
 
-<option value="staff">Store Staff</option>
+                    <option value="staff">Store Staff</option>
 
-</select>
+                </select>
 
-<button type="submit" className="w-full bg-green-600 text-white p-2 rounded">
+                <button type="submit" className="w-full bg-green-600 text-white p-2 rounded">
 
-Register
+                    Register
 
-</button>
+                </button>
 
-</form>
+            </form>
 
-</div>
+        </div>
 
-);
+    );
 
 };
 
