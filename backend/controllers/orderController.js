@@ -2,7 +2,7 @@
 const Order = require('../models/Orders');
 const orderEvents = require('../observers/orderEvents');
 const createOrderValidationChain = require('../validation/orderValidationChain')
-const { getOrderState } = require('../states/orderStates');
+const { getOrderState } = require('../states/OrderStates');
 
 const getOrders = async (req, res) => {
     try {
