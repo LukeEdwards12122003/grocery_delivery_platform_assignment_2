@@ -80,21 +80,71 @@ describe('Order validation chain', () => {
     )
   })
 
-    it('checks postcode format before the delivery area', () => {
-      const chain = createOrderValidationChain()
+  it('checks postcode format before the delivery area', () => {
+    const chain = createOrderValidationChain()
 
-      const result = chain.handle({
-        item: 'Milk',
-        quantity: 2,
-        deliveryMethod: 'standard',
-        streetAddress: '123 Test Street',
-        suburb: 'Brisbane City',
-        postcode: '40A0',
-      })
-
-      expect(result.valid).to.equal(false)
-      expect(result.message).to.equal(
-        'Postcode must contain exactly four digits',
-      )
+    const result = chain.handle({
+      item: 'Milk',
+      quantity: 2,
+      deliveryMethod: 'standard',
+      streetAddress: '123 Test Street',
+      suburb: 'Brisbane City',
+      postcode: '40A0',
     })
+
+    expect(result.valid).to.equal(false)
+    expect(result.message).to.equal(
+      'Postcode must contain exactly four digits',
+    )
+  })
+})
+
+describe('Order validation chain with delivery method', () => {
+  it('accepts a valid delivery order', () => {
+    const chain = createOrderValidationChain(true)
+
+    const result = chain.handle({
+      "item": "Milk",
+      "quantity": 2,
+      "deliveryMethod": "standard",
+      "streetAddress": "123 Test Street",
+      "suburb": "Brisbane City",
+      "postcode": "4000"
+    }
+    )
+
+    expect(result.valid).to.equal(true)
+  })
+
+  it('rejects an invalid delivery method', () => {
+    const chain = createOrderValidationChain(true)
+
+    const result = chain.handle({
+      "item": "Milk",
+      "quantity": 2,
+      "deliveryMethod": "pickup",
+      "streetAddress": "123 Test Street",
+      "suburb": "Brisbane City",
+      "postcode": "4000"
+    }
+    )
+    expect(result.valid).to.equal(false)
+    expect(result.message).to.equal('Invalid delivery method')
+  })
+
+  it('rejects a missing delivery method', () => {
+    const chain = createOrderValidationChain(true)
+
+    const result = chain.handle({
+      "item": "Milk",
+      "quantity": 2,
+      "deliveryMethod": "",
+      "streetAddress": "123 Test Street",
+      "suburb": "Brisbane City",
+      "postcode": "4000"
+    }
+    )
+    expect(result.valid).to.equal(false)
+    expect(result.message).to.equal('Delivery method is required')
+  })
 })

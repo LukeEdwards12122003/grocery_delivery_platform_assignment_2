@@ -206,10 +206,6 @@ const updateDeliveryMethod = async (req, res) => {
             return res.status(403).json({ message: 'Only customers can update delivery method' });
         }
 
-        if (!['standard', 'express'].includes(deliveryMethod)) {
-            return res.status(400).json({ message: 'Invalid delivery method' });
-        }
-
         if (!Array.isArray(orderIds) || orderIds.length === 0) {
             return res.status(400).json({ message: 'Order IDs must be a non-empty array' });
         }
@@ -228,7 +224,7 @@ const updateDeliveryMethod = async (req, res) => {
         })
       }
 
-      const validationChain = createOrderValidationChain()
+      const validationChain = createOrderValidationChain(true)
       const updates = []
 
       // Validate every selected order before saving any, so one invalid order blocks the whole update.
