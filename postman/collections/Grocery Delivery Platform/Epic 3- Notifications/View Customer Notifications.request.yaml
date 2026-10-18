@@ -1,5 +1,27 @@
 $kind: http-request
-url: ""
+name: View Customer Notifications
+url: "{{base_url}}/api/notifications"
 method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Customer notifications load successfully", function () {
+          pm.response.to.have.status(200);
+          pm.expect(pm.response.json()).to.be.an("array");
+      });
+
+      pm.test("Customer B can see their order notification", function () {
+          const notifications = pm.response.json();
+          pm.expect(notifications.some(n => n._id === "6ad4699e7a114c303cc8eda0"))
+              .to.be.true;
+      });
+    language: text/javascript
 settings: {}
 order: 1792298785996

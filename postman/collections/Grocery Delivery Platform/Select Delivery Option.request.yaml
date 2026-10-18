@@ -1,0 +1,20 @@
+$kind: http-request
+name: Select Delivery Option
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+      "orderIds": ["6ad450277a114c303cc8ed51"],
+      "deliveryMethod": "standard",
+      "streetAddress": "10 Test Street",
+      "suburb": "Brisbane",
+      "postcode": "4000"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+settings: {}
+order: 3846498203827865

@@ -1,5 +1,21 @@
 $kind: http-request
-url: ""
-method: GET
+name: Reject Another User Notification Access
+url: "{{base_url}}/api/notifications/6ad4699e7a114c303cc8eda0/read"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Cannot access another customer's notification", function () {
+          pm.response.to.have.status(404);
+      });
+
+      pm.test("Notification is reported as not found", function () {
+          pm.expect(pm.response.json().message).to.equal("Notification not found");
+      });
+    language: text/javascript
 settings: {}
 order: 4493767478142748

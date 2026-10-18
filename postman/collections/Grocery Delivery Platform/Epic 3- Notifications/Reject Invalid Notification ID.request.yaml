@@ -1,5 +1,21 @@
 $kind: http-request
-url: ""
-method: GET
+name: Reject Invalid Notification ID
+url: "{{base_url}}/api/notifications/not-a-valid-id/read"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Invalid notification ID is rejected", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Invalid notification ID message is returned", function () {
+          pm.expect(pm.response.json().message).to.equal("Invalid notification ID");
+      });
+    language: text/javascript
 settings: {}
 order: 4500866654541170

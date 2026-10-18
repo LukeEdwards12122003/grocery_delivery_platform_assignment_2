@@ -1,6 +1,6 @@
 $kind: http-request
 name: Staff Update Order Status
-url: "{{base_url}}/api/orders/6ac729d99dd0940b04a85628/status"
+url: "{{base_url}}/api/orders/6ad465e17a114c303cc8ed71/status"
 method: PUT
 headers:
   Authorization: Bearer {{staff_token}}
@@ -19,7 +19,7 @@ scripts:
           pm.response.to.have.status(200);
       });
 
-      pm.test("Order status is Preparing", function () {
+      pm.test("Updated order status is returned", function () {
           pm.expect(pm.response.json().status).to.equal("Preparing");
       });
     language: text/javascript
