@@ -1,6 +1,6 @@
 $kind: http-request
 name: Mark Customer Notification as Read
-url: "{{base_url}}/api/notifications/6ad4699e7a114c303cc8eda0/read"
+url: "{{base_url}}/api/notifications/6ad49d587a114c303cc8edec/read"
 method: PATCH
 auth:
   type: bearer

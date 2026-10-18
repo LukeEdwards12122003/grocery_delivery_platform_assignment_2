@@ -32,7 +32,7 @@ scripts:
           const response = pm.response.json();
 
           if (response.token) {
-              pm.collectionVariables.set("customer_token", response.token);
+              pm.collectionVariables.set("customer_b_token", response.token);
           }
       }
     language: text/javascript

@@ -1,18 +1,9 @@
-owner: "35333614"
-team: "30995904"
-lastUpdatedBy: "35333614"
-lastRevision: 1791459636000
 name: Local
 values:
   - key: base_url
-    value: http://localhost:5001
-    enabled: true
-  - key: "customer_token "
-    value: ""
-    enabled: true
+    value: 'http://localhost:5001'
+  - key: customer_token
+    value: ''
   - key: staff_token
-    value: ""
-    enabled: true
-createdAt: 2026-10-08T11:19:53.000Z
-updatedAt: 2026-10-08T11:40:36.000Z
+    value: ''
 color: 60
