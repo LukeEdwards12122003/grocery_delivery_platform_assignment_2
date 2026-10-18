@@ -53,10 +53,8 @@ jobs:
     - name: Install Frontend Dependencies
       working-directory: ./frontend
       run: |
-        df -h
-        sudo rm -rf ./build
-        yarn install
-        yarn run build
+            yarn install
+            CI=false yarn run build
 
 
     # Run backend tests
