@@ -16,7 +16,8 @@ Customers can register, log in, place grocery delivery orders, and view their su
 - Enter a quantity and delivery address
 - View submitted orders
 - View current order status
-- choose what their 
+- choose what their deliver option is
+- edit orders
 
 ### Store Staff
 
