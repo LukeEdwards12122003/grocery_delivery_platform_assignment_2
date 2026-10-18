@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Grocery Delivery Platform is a small MERN web application developed for IFN636 Assessment 1. The application demonstrates two user roles and two connected end-to-end workflows
+The Grocery Delivery Platform is a small MERN web application developed for IFN636 Assessment 1. The application demonstrates two user roles and two connected end-to-end workflows.
 
 Customers can register, log in, place grocery delivery orders, and view their submitted orders and current status. Store Staff can log in, view incoming customer orders, and update each order's status.
 
