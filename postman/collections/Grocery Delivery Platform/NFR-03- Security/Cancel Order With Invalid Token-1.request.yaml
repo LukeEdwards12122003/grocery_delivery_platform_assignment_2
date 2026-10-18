@@ -1,0 +1,22 @@
+$kind: http-request
+name: Cancel Order With Invalid Token
+url: "{{base_url}}/api/orders/6ad450277a114c303cc8ed51/cancel"
+method: PATCH
+headers:
+  Authorization: "{{bearer_token_1bsn}}"
+body:
+  type: json
+  content: |-
+    {
+      "status": "Pending"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Request with an invalid token is rejected", function () {
+          pm.response.to.have.status(401);
+          pm.expect(pm.response.json().message)
+              .to.equal("Not authorized, token failed");
+      });
+    language: text/javascript
+order: 4503599250915042

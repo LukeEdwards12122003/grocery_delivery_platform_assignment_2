@@ -1,0 +1,26 @@
+$kind: http-request
+name: Update Delivery Method With Invalid Token
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
+headers:
+  Authorization: "{{bearer_token_1bsn}}"
+body:
+  type: json
+  content: |-
+    {
+      "orderIds": ["6ad450277a114c303cc8ed51"],
+      "deliveryMethod": "standard",
+      "streetAddress": "10 Test Street",
+      "suburb": "Brisbane",
+      "postcode": "4000"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Request with an invalid token is rejected", function () {
+          pm.response.to.have.status(401);
+          pm.expect(pm.response.json().message)
+              .to.equal("Not authorized, token failed");
+      });
+    language: text/javascript
+order: 4503504858715327

@@ -1,0 +1,21 @@
+$kind: http-request
+name: Place Order Without Token
+url: "{{base_url}}/api/orders"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "item": "NFR031_NO_TOKEN_TEST",
+      "quantity": 2
+    }
+scripts:
+  - type: afterResponse
+    code: |
+      pm.test("Request without a token is rejected", function () {
+          pm.response.to.have.status(401);
+          pm.expect(pm.response.json().message)
+              .to.equal("Not authorized, no token");
+      });
+    language: text/javascript
+order: 3062716770116362

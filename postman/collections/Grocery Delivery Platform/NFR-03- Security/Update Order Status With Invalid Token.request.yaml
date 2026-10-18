@@ -1,0 +1,22 @@
+$kind: http-request
+name: Update Order Status With Invalid Token
+url: "{{base_url}}/api/orders/6ad450277a114c303cc8ed51/status"
+method: PUT
+headers:
+  Authorization: "{{bearer_token_1bsn}}"
+body:
+  type: json
+  content: |-
+    {
+      "status": "Pending"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Request with an invalid token is rejected", function () {
+          pm.response.to.have.status(401);
+          pm.expect(pm.response.json().message)
+              .to.equal("Not authorized, token failed");
+      });
+    language: text/javascript
+order: 4503579414811238

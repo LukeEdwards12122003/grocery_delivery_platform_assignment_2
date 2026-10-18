@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{base_url}}/api/orders"
+method: GET
+body:
+  type: json
+  content: ""
+scripts:
+  - type: afterResponse
+    code: |
+      pm.test("Request without a token is rejected", function () {
+          pm.response.to.have.status(401);
+          pm.expect(pm.response.json().message)
+              .to.equal("Not authorized, no token");
+      });
+    language: text/javascript
+order: 1792297843047

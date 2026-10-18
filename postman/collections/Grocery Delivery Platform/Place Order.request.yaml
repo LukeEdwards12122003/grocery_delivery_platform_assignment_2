@@ -9,7 +9,7 @@ body:
   content: |-
     {
       "item": "Eggs",
-      "quantity": 5
+      "quantity": 2
     }
 auth:
   type: noauth

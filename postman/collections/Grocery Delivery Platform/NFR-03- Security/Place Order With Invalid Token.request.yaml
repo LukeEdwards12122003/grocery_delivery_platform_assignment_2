@@ -1,0 +1,23 @@
+$kind: http-request
+name: Place Order With Invalid Token
+url: "{{base_url}}/api/orders"
+method: POST
+headers:
+  Authorization: "{{bearer_token_1bsn}}"
+body:
+  type: json
+  content: |-
+    {
+      "item": "NFR031_NO_TOKEN_TEST",
+      "quantity": 2
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Request with an invalid token is rejected", function () {
+          pm.response.to.have.status(401);
+          pm.expect(pm.response.json().message)
+              .to.equal("Not authorized, token failed");
+      });
+    language: text/javascript
+order: 4294980844289635
