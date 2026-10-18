@@ -1,6 +1,6 @@
 
 const assert = require('assert');
-const { getOrderState } = require('../states/orderStates');
+const { getOrderState } = require('../states/OrderStates');
 
 describe('GDP-45 Order State pattern', () => {
     it('permits editing and cancellation only when Pending', () => {
