@@ -206,9 +206,13 @@ describe('Notifications - Observer Pattern Tests', () => {
             status: 'Pending'
         };
 
-        order.save = sinon.stub().resolves(order);
-
         sinon.stub(Order, 'findById').resolves(order);
+
+        sinon.stub(Order, 'findOneAndUpdate').resolves({
+            ...order,
+            status: 'Preparing'
+        });
+        
         const notifyStub = sinon.stub(orderEvents, 'notify').resolves();
 
         const req = {
