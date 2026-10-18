@@ -17,10 +17,24 @@ scripts:
           pm.expect(pm.response.json()).to.be.an("array");
       });
 
-      pm.test("Customer B can see their order notification", function () {
+      pm.test("Customer can see their order notification", function () {
           const notifications = pm.response.json();
-          pm.expect(notifications.some(n => n._id === "6ad4699e7a114c303cc8eda0"))
-              .to.be.true;
+          const notification = notifications.find(
+              n => n._id === "6ad49d587a114c303cc8edec"
+          );
+
+          pm.expect(notification).to.exist;
+          pm.expect(notification.recipientId).to.equal("6ad44f487a114c303cc8ed49");
+          pm.expect(notification.orderId).to.equal("6ad450277a114c303cc8ed51");
+      });
+
+      pm.test("Read status remains saved", function () {
+          const notification = pm.response.json().find(
+              n => n._id === "6ad49d587a114c303cc8edec"
+          );
+
+          pm.expect(notification).to.exist;
+          pm.expect(notification.isRead).to.be.true;
       });
     language: text/javascript
 settings: {}

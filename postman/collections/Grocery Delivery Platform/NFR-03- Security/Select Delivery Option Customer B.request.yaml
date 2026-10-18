@@ -15,5 +15,5 @@ body:
 auth:
   type: bearer
   credentials:
-    token: "{{customer_token}}"
+    token: "{{customer_b_token}}"
 order: 4503598851047580
