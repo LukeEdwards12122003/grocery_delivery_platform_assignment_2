@@ -225,7 +225,7 @@ describe('Notifications - Observer Pattern Tests', () => {
 
         await updateOrderStatus(req, res);
 
-        expect(order.status).to.equal('Preparing');
+        expect(res.json.firstCall.args[0].status).to.equal('Preparing');
         expect(res.json.calledOnce).to.be.true;
         expect(notifyStub.calledOnce).to.be.true;
 
