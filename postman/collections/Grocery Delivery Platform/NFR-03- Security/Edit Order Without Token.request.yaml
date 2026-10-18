@@ -1,0 +1,25 @@
+$kind: http-request
+name: Edit Order Without Token
+url: "{{base_url}}/api/orders/6ad450277a114c303cc8ed51/edit"
+method: PATCH
+headers:
+  - key: Authorization
+    value: ""
+    disabled: true
+body:
+  type: json
+  content: |-
+    {
+      "item": "Bread",
+      "quantity": 3
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Request without a token is rejected", function () {
+          pm.response.to.have.status(401);
+          pm.expect(pm.response.json().message)
+              .to.equal("Not authorized, no token");
+      });
+    language: text/javascript
+order: 4503599595023857

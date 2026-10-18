@@ -1,4 +1,5 @@
 $kind: http-request
+name: Register Customer B
 url: "{{base_url}}/api/auth/register"
 method: POST
 body:
@@ -6,8 +7,8 @@ body:
   content: |-
     {
       "name": "Test Customer",
-      "email": "customer.test@example.com",
+      "email": "customer.b.test@example.com",
       "password": "TestPassword123!",
       "role": "customer"
     }
-order: 2000
+order: 4503598015277609

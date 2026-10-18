@@ -2,11 +2,14 @@ $kind: collection
 name: Grocery Delivery Platform
 variables:
   - key: base_url
-    value: 'http://localhost:5001'
+    value: http://localhost:5001
     disabled: false
   - key: customer_token
     secret: true
     disabled: false
   - key: staff_token
+    secret: true
+    disabled: false
+  - key: bearer_token_1bsn
     secret: true
     disabled: false

@@ -1,6 +1,6 @@
 $kind: http-request
 name: Customer Cannot Update Order Status
-url: "{{base_url}}/api/orders/6ac721da9dd0940b04a85607/status"
+url: "{{base_url}}/api/orders/6ad465e17a114c303cc8ed71/status"
 method: PUT
 headers:
   Authorization: Bearer {{customer_token}}
@@ -22,9 +22,9 @@ scripts:
           pm.response.to.have.status(403);
       });
 
-      pm.test("Correct access error is returned", function () {
+      pm.test("Staff-only restriction is returned", function () {
           pm.expect(pm.response.json().message)
               .to.equal("Only store staff can update order status");
       });
     language: text/javascript
-order: 4038053381841351
+order: 4503599094482985

@@ -1,0 +1,28 @@
+$kind: http-request
+name: Update Delivery Method Without Token
+url: "{{base_url}}/api/orders/delivery-method"
+method: PATCH
+headers:
+  - key: Authorization
+    value: ""
+    disabled: true
+body:
+  type: json
+  content: |-
+    {
+      "orderIds": ["6ad450277a114c303cc8ed51"],
+      "deliveryMethod": "standard",
+      "streetAddress": "10 Test Street",
+      "suburb": "Brisbane",
+      "postcode": "4000"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Request without a token is rejected", function () {
+          pm.response.to.have.status(401);
+          pm.expect(pm.response.json().message)
+              .to.equal("Not authorized, no token");
+      });
+    language: text/javascript
+order: 4479571487790797

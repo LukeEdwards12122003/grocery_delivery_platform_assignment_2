@@ -1,0 +1,18 @@
+$kind: http-request
+name: Customer A Cannot Cancel Customer B Order
+url: "{{base_url}}/api/orders/6ad465e17a114c303cc8ed71/cancel"
+method: PATCH
+headers:
+  Authorization: Bearer {{customer_token}}
+body:
+  type: json
+  content: ""
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Customer cannot cancel another customer's order", function () {
+          pm.response.to.have.status(404);
+          pm.expect(pm.response.json().message).to.equal("Order not found");
+      });
+    language: text/javascript
+order: 4503598014630175

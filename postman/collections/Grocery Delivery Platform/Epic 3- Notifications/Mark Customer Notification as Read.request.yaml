@@ -1,0 +1,21 @@
+$kind: http-request
+name: Mark Customer Notification as Read
+url: "{{base_url}}/api/notifications/6ad4699e7a114c303cc8eda0/read"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{customer_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Customer can mark their own notification as read", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Read confirmation is returned", function () {
+          pm.expect(pm.response.json().message).to.equal("Notification marked as read");
+      });
+    language: text/javascript
+settings: {}
+order: 4487957408069896

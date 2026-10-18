@@ -1,0 +1,19 @@
+$kind: http-request
+name: Get Orders With Invalid Token
+url: "{{base_url}}/api/orders"
+method: GET
+headers:
+  Authorization: "{{bearer_token_1bsn}}"
+body:
+  type: json
+  content: ""
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Request with an invalid token is rejected", function () {
+          pm.response.to.have.status(401);
+          pm.expect(pm.response.json().message)
+              .to.equal("Not authorized, token failed");
+      });
+    language: text/javascript
+order: 2647917977786388

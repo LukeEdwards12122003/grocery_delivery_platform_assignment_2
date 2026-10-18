@@ -1,0 +1,27 @@
+$kind: http-request
+name: Update Order Status Without Token
+url: "{{base_url}}/api/orders/6ad450277a114c303cc8ed51/status"
+method: PUT
+headers:
+  - key: Authorization
+    value: ""
+    disabled: true
+body:
+  type: json
+  content: |-
+    {
+      "status": "Pending"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Request without a token is rejected", function () {
+          pm.response.to.have.status(401);
+      });
+
+      pm.test("Missing-token error is returned", function () {
+          pm.expect(pm.response.json().message)
+              .to.equal("Not authorized, no token");
+      });
+    language: text/javascript
+order: 4503547684102942

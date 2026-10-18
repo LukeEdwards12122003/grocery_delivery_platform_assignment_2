@@ -1,0 +1,21 @@
+$kind: http-request
+name: View Notifications With Invalid Token
+url: "{{base_url}}/api/notifications"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: invalid.token.value
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Notifications request with an invalid token is rejected", function () {
+          pm.response.to.have.status(401);
+      });
+
+      pm.test("Invalid-token error is returned", function () {
+          pm.expect(pm.response.json().message).to.equal("Not authorized, token failed");
+      });
+    language: text/javascript
+settings: {}
+order: 4473968456804250
