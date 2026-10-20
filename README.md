@@ -30,12 +30,12 @@ Customers can register, log in, place grocery delivery orders, and view their su
 ## Order Status
 
 Orders can have one of the following statuses:
-
+- Draft
 - Pending
 - Preparing
 - Completed
 
-New orders are automatically created with a Pending status.
+New orders with delivery option are automatically created with a Pending status.
 
 ## Application Architecture
 
